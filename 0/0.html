@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+
+    <title></title>
+
+</head>
+<body>
+    <script>
+
+
+        // creer un node canvas
+        var canvas = document.createElement( "canvas" );
+        document.body.appendChild( canvas );
+
+        //assigner la taille en pixels
+        canvas.width = 512;
+        canvas.height = 512;
+
+        //demande une reference au context graphique (l'API de dessin)
+        var context = canvas.getContext( "2d" );
+
+        //dessine un rectangle noir (couleur par defaut)
+        context.fillRect( 0,0,512,512 );
+
+
+    </script>
+</body>
+</html>

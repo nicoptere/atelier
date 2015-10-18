@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+
+    <title></title>
+
+    <style>
+
+        head, body
+        {
+            width:100%;
+            height:100%;
+            overflow: hidden;
+            margin:0;
+            padding:0;
+            background-color: #EEE;
+        }
+        #speed
+        {
+            position: absolute;
+            top:0;
+            left:0;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../base.js"></script>
+<script src="../geom.js"></script>
+<script src="../graphics.js"></script>
+
+<script>
+
+    //on utilise l'utilitaire graphique
+    var G = new Graphics(ctx);
+
+//    var mouseDown = false;
+//    var mouse = new Point();
+//    var A = new Point(w/2 - 100,h/2);
+//    var B = new Point(w/2 + 100,h/2);
+
+    function draw()
+    {
+
+        requestAnimationFrame( draw );
+        ctx.clearRect( 0,0,w,h );
+
+        //partant de 3 valeurs arbitraires T, A et B
+        //normaliser T entre A et B permet de retrouver un indice compris entre 0 et 1
+
+        var t = 10;
+        var a = -5;
+        var b = 50;
+
+        //pour normaliser la vaeur T entre A et B, on fait quelque chose comme:
+
+        var norm = ( t - a ) / ( b - a );// 0.2727272727272727 si t = 10, a = -5 et b = 50
+        //console.log( norm );
+
+        //on peut donner différentes valeurs à T
+
+        // t = -5 , a = -5, b = 50 > norm = 0
+        // t =  0 , a = -5, b = 50 > norm = 0.09090909090909091
+        // t = 10 , a = -5, b = 50 > norm = 0.2727272727272727
+        // t = 49 , a = -5, b = 50 > norm = 0.9818181818181818
+        // t = 50 , a = -5, b = 50 > norm = 1
+
+        //tant que T est compris entre A et B, la valeur de norm sera comprise entre 0 et 1
+
+        //si T < A ou si T > B notre norme ne sera plus comprise entre 0 et 1
+        //par exemple
+        // t = -6 > norm = -0.01818181818181818
+        // t = 51 > norm = 1.018181818181818
+
+
+
+        //dans la vraie vie:
+        //on a un ensemble de données dont on ne connait pas la taille
+        //on veut les faire tenir dans un tableau de taille donnée
+
+        var i, x;
+        var count = 200;
+        var min = -10000;
+        var max = 10000;
+        var values = [];
+
+        //on remplit un tableau avec 200 valeurs aléatoires comprises entre min et max (-10000 et 10000 )
+        for( i = 0; i < count; i++ )
+        {
+            //sachant que Math.random() renvoie une valeur aléatoire normalisée ( comprise entre 0 et 1 )
+
+            //on utilise lerp( Math.random(), A, B ) pour obtenir une valeur aléatoire comprise entre min et max
+            x = lerp( Math.random(), min, max );
+
+            //on l'ajoute au tableau
+            values.push( x );
+
+        }
+
+        //si on essaye de représenter les valeurs de ce tableau à l'écran, beaucoup devraient se retrouver hors champ
+        //en effet, soit une sera inférieure à 0 soit elle sera supérieure à la largeur de l'écran
+        for( i = 0; i < values.length; i++ )
+        {
+            //on récupère la valeur du tableau
+            x = values[i];
+
+            //on la dessine (souvent hors champ)
+            G.circle( x, h / 2, 2 );
+
+        }
+
+        return;
+
+        //en revanche, si on normalise chaque valeur entre min et max, on obtiendra un chiffre compris entre 0 et 1
+        //ce chiffre peut ensuite être interpolé entre les valeurs de notre choix par exemple, 100 et w-100
+
+        //essayons
+        //on commence par nettoyer le contexte pour ne pas que le dessin précédent interfère
+        ctx.clearRect( 0,0,w,h );
+
+        //on choisit les bornes entre lesquelles on veut dessiner
+        var A = 100; //de 100px à gauche
+        var B = w - 100; //à ( largeur - 100px ) à droite
+
+        //si on essaye de représenter les valeurs de ce tableau à l'écran, beaucoup devraient se retrouver hors champ
+        for( i = 0; i < values.length; i++ )
+        {
+            //récupère la valeur
+            x = values[i];
+
+            //normalise la valeur entre min et max
+            norm = ( x - min ) / ( max - min );
+
+            //interpole la valeur normalisée entre A et B
+
+            var position = lerp( norm, A, B );
+
+            //dessine la position
+            G.circle( position, h / 2, 2 );
+
+        }
+
+
+//
+//        var x = lerp( Math.random(), min, max );
+//        var y = lerp( Math.random(), min, max );
+//        var p = new Point(x,y);
+//        values.push( p );
+//    }
+
+
+    }
+
+    draw();
+
+</script>
+
+
+</body>
+</html>

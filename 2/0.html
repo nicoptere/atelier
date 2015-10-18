@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+
+    <title></title>
+
+    <style>
+
+        head, body
+        {
+            width:100%;
+            height:100%;
+            overflow: hidden;
+            margin:0;
+            padding:0;
+            background-color: #EEE;
+        }
+
+    </style>
+
+</head>
+<body>
+<script src="../base.js"></script>
+<script>
+
+
+    function draw()
+    {
+        
+        requestAnimationFrame( draw );
+        ctx.clearRect( 0,0,w,h );
+
+        /*
+        la commande cercle: 
+        il n'y a pas d'instruction ctx.circle()
+        le cercle est un cas particulier d'un arc de cercle.
+        c'est un arc de cercle de 360° ou 2 * PI 
+
+        de fait l'instruction pour dessiner un cercle est:
+
+        ctx.arc( X, Y, Rayon, Angle, LongueurArc, Direction )
+        
+        où:
+
+        X = position du centre du cercle en X
+        Y = position du centre du cercle en Y
+
+        Rayon = le rayon du cercle
+        
+        Angle = l'angle de départ de l'arc en RADIANS
+        
+        LongueurArc = la longueur de l'arc en RADIANS
+        
+        Direction = true|false détermine dans quel sens on dessine (horaire ou antihoraire)
+
+
+        RADIANS?
+
+        un RADIAN est une mesure d'angle sui vaut:
+
+        RADIAN = PI / 180
+        DEGRES = 180 / PI
+
+        sauf cas particulier tous les mesures d'angles se font en RADIANS
+
+        pour passer des degrés aux radians on peut faire:
+        
+            radians = degres * ( Math.PI / 180 )
+
+        et inversement pour passer des radians aux degrés:
+
+            degres = radians * ( 180 / Math.PI )
+
+        NB : 2 constantes RAD et DEG sont présentes dans base.js 
+
+        */
+
+        var cx = w / 2;// X
+        var cy = h / 2;// Y
+
+        var radius = 150;// R
+        
+        //ça va servir
+        var RADIANS = Math.PI / 180;
+
+        var angle = 0;// Angle de départ en radians
+        
+        var arcLength = Math.PI * 2;// LongueurArc en radians
+
+        var direction = false;// Direction horaire | antihoraire
+
+        //commence un ensemble d'instructions de dessin
+        ctx.beginPath();
+
+            //se positionne au centre
+            //ctx.moveTo( cx, cy );
+        
+        //instruction de dessin d'un arc
+        ctx.arc( cx, cy, radius, angle, arcLength, direction );
+
+            //ferme la forme
+            //ctx.closePath();
+
+
+        //assigne le style de trait
+        ctx.lineWidth = 10; 
+        ctx.strokeStyle = "#06C";
+        ctx.stroke();
+
+        //assigne le style de remplissage
+        ctx.fillStyle = "#FC0";
+        //ctx.fill();
+        
+    }
+    draw();
+
+</script>
+</body>
+</html>

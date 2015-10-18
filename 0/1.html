@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+
+    <title></title>
+
+    <style>
+
+        head, body
+        {
+            width:100%;
+            height:100%;
+            overflow: hidden;
+            margin:0;
+            padding:0;
+            background-color: #EEE;
+        }
+
+        #canvas{
+            margin: auto;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+        }
+
+        @keyframes rotating {
+            from{
+                transform: rotate(0deg);
+                border-radius: 25%;
+                background-color: #FC0;
+            }
+            50%
+            {
+                border-radius: 0;
+                background-color: #C06;
+            }
+            to{
+                transform: rotate(360deg);
+                border-radius: 25%;
+                background-color: #FC0;
+
+            }
+        }
+        .rotating {
+            animation: rotating 8s linear infinite;
+        }
+    </style>
+
+</head>
+<body>
+    <script>
+
+
+        // fonction permettant de créer / recupérer un contexte graphique
+        function getContext(w,h) {
+            var canvas = document.createElement( "canvas" );
+            canvas.width = w;
+            canvas.height = h;
+            return canvas.getContext( "2d" );
+        }
+
+        //crée un contexte graphique (API de dessin)
+        var width = 512;
+        var height = 512;
+        var ctx = getContext( width, height );
+
+        //le contexte maintient une reference a l'élément du DOM (le <canvas>) auquel il fait référence
+        var canvas = ctx.canvas;
+        document.body.appendChild( canvas );
+
+        //dessine un rectangle
+        ctx.fillRect( 0,0,width, height );
+
+        //efface une zone rectangulaire
+//        ctx.clearRect( X, Y, W, H );
+//        ctx.clearRect( 64,64,384,384 );
+
+        //dessine un carré bleu ( #06C = bleu )
+//        ctx.fillStyle = "#06C";
+//        ctx.fillRect( 128,128,256,256 );
+
+        //comme c'est un element HTML "normal" on peut ajouter des règles CSS:
+
+        //centrage CSS
+//        canvas.setAttribute( "id", "canvas" );
+
+        //rotation CSS
+//        canvas.className = "rotating";
+
+
+
+
+    </script>
+</body>
+</html>
