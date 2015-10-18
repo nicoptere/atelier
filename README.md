@@ -1,2 +1,4 @@
 # atelier
-mise en jambe et survol de principes de base du code graphique 
+alleez à cette adresse ou téléchargez le tout, je ne sais pas lequel est le plus simple.
+
+https://rawgit.com/nicoptere/atelier/master/index.html[https://rawgit.com/nicoptere/atelier/master/index.html]
