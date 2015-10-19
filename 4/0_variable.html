@@ -62,7 +62,49 @@
         //on dessine
         ctx.stroke();
 
+        // A % B : A modulo B : retourne le reste de la division de A par B
+        //faire en sorte que la variable position reste dans le champ visible
+        /*
+        position %= w;
+        //*/
 
+        //représenter la variable comme un ratio compris entre 0-1 (ou normalisée, voir les exemples précédents, lerp, norm, map )
+//        /*
+        var ratio = position / w;
+        //ou entre 1 et 0
+        var inverse = 1 - ( position / w );
+        //*/
+
+        //ça devient intéressant puisque notre variable est maintenant utilisable autrement
+        //on peut "indexer" un autre paramètre dessus
+        //par exemple dessiner un rectangle qui descend en fontion de la position X
+
+        /*
+        ctx.strokeRect( position, ratio * h, 20,20 );
+        //*/
+
+        //ou qui monte
+        /*
+        ctx.strokeRect( position, inverse * h, 20,20 );
+        //*/
+
+        //ou qui monte et qui s'étire
+        /*
+        ctx.strokeRect( position, inverse * h, ratio * 500,20 );
+        //*/
+
+        //ou encore obtenir une couleur qui varie en fonction de ratio
+
+        /*
+        //crée une couleur basée sur la position
+        ctx.fillStyle = "hsl( " + ( 360 * ratio ) +", 100%, 50% )";
+
+        //dessine un disque avec une couleur indexée sur la position
+        ctx.beginPath();
+        ctx.arc( position, h / 2, 50, 0, Math.PI * 2 );
+        ctx.fill();
+
+        //*/
     }
 
     function onDown()
