@@ -125,7 +125,7 @@
 
         return;
 
-        //il est possible de tracer les mêmes courbes à partir d'une série de segments et grâce à des interpolations linéaires
+        //il est possible de tracer des portions de courbes grâce à des interpolations linéaires
         //à un temps T, on commence par trouver 2 points CA et CB respectivement placés entre A / B et B / C
 
         //on crée une variable dont l'oscillation est basée sur le temps
@@ -189,6 +189,9 @@
         ctx.quadraticCurveTo( CB.x, CB.y, C.x, C.y );
         ctx.stroke();
         //*/
+
+        //la méthode se trouve dans graphics:
+        // G.quadCurve( A,B,C );
 
     }
     draw();

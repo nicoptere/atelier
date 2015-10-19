@@ -99,5 +99,23 @@ var Graphics = function( ctx )
         exports.ctx.fill();
     };
 
+    exports.quadCurve = function( a,b,c )
+    {
+        exports.ctx.beginPath();
+        exports.ctx.moveTo(a.x, a.y );
+        exports.ctx.quadraticCurveTo(b.x, b.y, c.x, c.y );
+        exports.ctx.stroke();
+    };
+
+    exports.bezierCurve = function( a,b,c,d )
+    {
+        exports.ctx.beginPath();
+        exports.ctx.moveTo(a.x, a.y );
+        exports.ctx.bezierCurveTo(b.x, b.y, c.x, c.y, d.x, d.y );
+        exports.ctx.stroke();
+    };
+
+
+
     return exports;
 };
