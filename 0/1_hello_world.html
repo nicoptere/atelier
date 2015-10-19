@@ -68,9 +68,19 @@
         var canvas = ctx.canvas;
         document.body.appendChild( canvas );
 
-        //dessine un rectangle
-        ctx.fillRect( 0,0,width, height );
 
+        //dessine un rectangle au trait entre:
+        // 64px à gauche
+        // 64px en haut
+        // 512 - ( 2 * 64 )px à droite
+        // 512 - ( 2 * 64 )px en bas
+
+        ctx.strokeRect( 64, 64, width - 128, height - 128 );
+
+        //dessine un rectangle plein
+        /*
+        ctx.fillRect( 0,0,width, height );
+        //*/
 
         //efface une zone rectangulaire
         /*
