@@ -1,4 +1,8 @@
 
+//déclaration de 2 variables w et h pour stocker la taille de l'écran
+var w = window.innerWidth;
+var h = window.innerHeight;
+
 //méthode de création d'un contexte graphique
 function getContext(w,h) {
 
@@ -8,7 +12,13 @@ function getContext(w,h) {
     return canvas.getContext( "2d" );
 }
 
-//mise étend le contexte sur toute la surface de la fenêtre
+//creation du contexte 2D
+var ctx = getContext( w, h );
+var canvas = ctx.canvas;
+document.body.appendChild( canvas );
+
+
+//étend le contexte sur toute la surface de la fenêtre et assigne les valeurs de w et h
 function onResize(){
 
     w = window.innerWidth;
@@ -17,16 +27,6 @@ function onResize(){
     ctx.canvas.height = h;
 }
 window.addEventListener( "resize", onResize, false );
-
-
-//creation du context
-var w = window.innerWidth;
-var h = window.innerHeight;
-
-var ctx = getContext( w, h );
-var canvas = ctx.canvas;
-document.body.appendChild( canvas );
-
 
 
 

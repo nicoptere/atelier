@@ -1,3 +1,14 @@
+/**
+ * usage :
+ var G = new Graphics( ctx );
+ G.line( p0, p1 )
+ G.circle( x, y, radius )
+ etc.
+ * @param ctx canvas 2d context
+ * @returns {{}} wraps some methods
+ * @constructor
+ */
+
 var Graphics = function( ctx )
 {
     var exports = {};

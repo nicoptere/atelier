@@ -6,6 +6,7 @@ var Point = function( x, y ){
     this.y = y || 0;
 };
 
+//deux méthodes utiles pour travailler avec des points
 Point.prototype =
 {
 
@@ -22,7 +23,6 @@ Point.prototype =
         var dy = other.y - this.y;
         return Math.sqrt( dx*dx + dy*dy );
     }
-
 
 };
 
