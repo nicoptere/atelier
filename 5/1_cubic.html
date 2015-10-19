@@ -29,6 +29,7 @@
 
     var G = new Graphics(ctx);
 
+    //méthode qui rend un ensemble de points et trace des lignes entre eux + éventuellement écrit une lettre au dessus
     function renderPointsAndLines(points, labels )
     {
 
@@ -65,10 +66,9 @@
         var C = new Point( cx + 100,   cy + 150 );
         var D = new Point( cx + 300,   cy - 150 );
 
+        //on les dessine par lot (ça va plus vite :) )
         var points = [A,B,C,D];
         var labels =["A","B","C","D"];
-
-        //on les dessine par lot (ça va plus vite :) )
         renderPointsAndLines( points, labels );
 
         //on a vu comment relier 3 points mais comment faire quand on en a 4?
@@ -77,7 +77,13 @@
         G.quadCurve(A,B,C);
         G.quadCurve(B,C,D);
         G.quadCurve(A,C,D);//?
-        G.quadCurve(C,B,D);//?
+        G.quadCurve(C,B,D);//mmm ... ?
+
+        G.text( "?", 96, cx - 48, cy );
+        //...nope!
+
+        return;
+
 
         /*
         ça ne semble pas très efficace, et c'est normal car il nous manque une partie des informations (le 4eme point)
@@ -100,7 +106,6 @@
         NB: comme pour les courbes quadratiques, les points ne doivent pas être colinéaires ("sur la même ligne") si on veut que ça marche
         //*/
 
-//        return;
 
         //rafraichit la vue
         ctx.clearRect( 0,0,w,h );
@@ -121,9 +126,7 @@
         //on valide les instructions
         ctx.stroke();
 
-
-
-//        return;
+        return;
 
         // comme pour les courbes quadratiques, il est possible de tracer des portions de courbes  grâce à des interpolations linéaires
         //comme il nous a fallu un point de plus pour tracer la courbe, il nous faudra cette fois ci créer 3 points intermédiaires, puis 2 pour obtenir le point
@@ -150,7 +153,7 @@
         renderPointsAndLines( [CA, CB, CC], ["CA", "CB", "CC" ] );
 
 
-//        return;
+        return;
 
 
         //pour déterminer où se trouve les 2 points de contôle intermédiaires CP0 et CP1 au temps T
@@ -170,7 +173,7 @@
         ctx.fillStyle = ctx.strokeStyle = "#FC0";
         renderPointsAndLines( [CP], ["CP"] );
 
-//        return;
+        return;
 
         //à présent nous avons tout ce dont nous avons besoin pour dessiner la courbe ou des portions de courbe
         // essayons:
