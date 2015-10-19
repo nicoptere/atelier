@@ -2,32 +2,53 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    <style>#exercices{ display: none; visibility: hidden;</style>
     <title>l'atelier</title>
 </head>
 <body>
+<h1>initiation au canvas 2D</h1>
+<h4>
+    je pars du principe que vous savez déjà manipuler les types primaires (Number, Strings, Arrays, Objects)<br>
+    connaissez les bases de la programmation Javascript (boucles, conditions)<br>
+    avez déjà utilisé un serveur local, un éditeur avancé ou les devtools.<br>
+    être familier avec une API de dessin aide un peu<br>
+    mais sinon, pas besoin de grand chose d'autre :)
+</h4>
+<ul>
 
-<ol>
+    <li>le plus simple est de <a href="https://github.com/nicoptere/atelier">cloner ou télécharger le repo</a> quelque part<br>
+        créer un serveur local qui pointe vers ce dossier<br>
+    </li>
+
+    <li>avec un éditeur de code pas trop con ou Node, créez plutôt une tâche planifiée</li>
+    <li>sinon, le REPL du pauvre:<br>
+        si vous n'avez pas d'éditeur avancé (sublime, webstorm, eclipse... )<br>
+        rendez vous sur l'index du serveur local (cette page)<br>
+        ouvrez la console de debug et affichez les sources<br>
+        clic-droit sur la fenêtre de navigation des sources(panneau de dorite)<br>
+        ajoutez le dossier racine à l'espace de travail<br>
+        vous avez à présent un droit en écriture sur les fichiers du serveur local
+    </li>
     <li>
-        le plus simple<br>
-        clonez ou téléchargez le repo quelque part<br>
-        ouvrez la console de debug<br>
-        affichez les sources<br>
-        ajoutez le dossier à l'espace de travail<br>
-        pui selon les articles:
+        ensuite, choississez une page et selon les cas:
         <ul>
-            <li>décommentez les blocs commentés</li>
-            <li>commentez les returns qui cassent la boucle de dessin</li>
+            <li>lisez les commentaires (pour la première page surtout)
+            <li>décommentez les blocs commentés (<strong>/*</strong> ><strong>//*</strong> )
+            <li>commentez les <i>return;</i> qui cassent la boucle de dessin <i>draw()</i></li>
         </ul>
-        ctrl + S <br>
+        ctrl + S ( sauver le doc )<br>
         F5 (recharger la page)
     </li>
+</ul>
+<ol>
 
 
     <li>survol des concepts</li>
     <ul>
-        <li><a href="0/0.html">hello world</a></li>
-        <li><a href="0/1.html">hello world 2 : la bas e qu'on va réutiliser tout le temps</a></li>
+        <li><a href="0/hello_world.html">hello world</a></li>
+        <li><a href="0/hello_world_2.html">hello world 2 : la bas e qu'on va réutiliser tout le temps</a></li>
     </ul>
+    <li><a href="https://developer.mozilla.org/fr/docs/Web/CSS/color_value">les couleurs (article de MDN)</a></li>
 
     <li>les primitives:</li>
     <ul>
@@ -43,7 +64,6 @@
         <li><a href="2/2.html">trigo angle et distance</a></li>
     </ul>
 
-    <li><a href="https://developer.mozilla.org/fr/docs/Web/CSS/color_value">les couleurs (article de MDN)</a></li>
 
     <li>représenter une variable</li>
     <ul>
@@ -60,19 +80,26 @@
 
 </ol>
 
-<h2>exercices</h2>
-créer des fonctions paramétriques permettant de:
-<ul>
-    <li>dessiner un carré avec des ronds</li>
-    <li>dessiner un rond avec des carrés</li>
+<div id="exercices">
 
-    <li>dessiner une grille avec un nombre de colonnes / rangées variable</li>
-    <li>dessiner une grille de largeur / hauteur variable</li>
+    <h2>exercices</h2>
+    créer des fonctions paramétriques permettant de:
+    <ul>
 
-</ul>
+        <li>couvrir l'écran de points</li>
 
+        <li>dessiner un carré avec des ronds</li>
+        <li>dessiner un rond avec des carrés</li>
 
-animer un point le long d'un cercle.
+        <li>animer un point le long d'un cercle.</li>
+
+        <li>dessiner une grille avec un nombre de colonnes / rangées variable</li>
+        <li>dessiner une grille de largeur / hauteur variable</li>
+        <li>dessiner une grille avec un nombre de colonnes / rangées variable et de largeur / hauteur variable</li>
+
+    </ul>
+</div>
+
 <br/><br/>
 references, tutos
 <ul>
