@@ -118,9 +118,11 @@
 
             ctx.setTransform( a,b,c,d,e,f );
 
-        où a, b, c et d servent pour les rotations
+        où a et d sont les valeurs de mise à l'échelle souvent appelées SX et SY
 
-        où b et c sont les valeurs de mise à l'échelle souvent appelées SX et SY ou skew
+        où b et c sont les valeurs de "skew" (distortion entre les extrémités, haut/bas | gauche/droite ) en Y et X, parfois aussi appelées SY et SX
+
+        où a, b, c et d servent pour les rotations
 
         où e et f sont les valeurs de translation souvent appelées TX et TY
 
@@ -314,6 +316,9 @@
 
         //le rectangle gris a été mis à l'échelle au dessus du rectangle vert
         //c'est généralement ce qu'on veut
+        //toutefois le plus sûr reste de setter la transformation directement avec
+        //ctx.setTrasform()
+
 
     }
     window.addEventListener( 'resize', draw, false );
