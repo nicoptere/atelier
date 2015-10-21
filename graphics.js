@@ -22,10 +22,11 @@ var Graphics = function( ctx )
         exports.ctx.lineTo( x1, y1 );
         exports.ctx.stroke();
     };
+
     exports.text = function( text, size, x,y )
     {
         exports.ctx.font = size + "pt Verdana ";
-        exports.ctx.fillText( text, x, y );
+        exports.ctx.fillText( text, x||0, y||0 );
     };
 
     exports.polyline = function( points, closed )

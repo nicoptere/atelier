@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+
+        head, body
+        {
+            width:100%;
+            height:100%;
+            overflow: hidden;
+            margin:0;
+            padding:0;
+            /*background-color: #EEE;*/
+        }
+
+    </style>
+</head>
+<body>
+
+
+<script src="../base.js"></script>
+<script src="../geom.js"></script>
+<script src="../graphics.js"></script>
+<script src="loader.js"></script>
+<script src="utils/cardinal.js"></script>
+<script src="utils/catmullrom.js"></script>
+<script src="utils/simplify.js"></script>
+<script src="utils/quadratic.js"></script>
+<script src="utils/kmeans.js"></script>
+
+<script>
+
+    /*
+    le CSV provient de:
+     https://donneespubliques.meteofrance.fr/?fond=produit&id_produit=90&id_rubrique=32
+     c'est un relevé météo sur 51 stations en france métropolitaine
+
+     le détail du format se trouve dans le pdf doc_parametres_synop_168.pdf
+     */
+
+    //on charge le CSV une fois qu ela page est chargée
+    window.onload = function()
+    {
+        loader.load( "synop.2015102115.csv", onCSVReady );
+    };
+
+    //on branche l'utilitaire de dessin sur le contexte
+    var G = new Graphics( ctx );
+
+    //on stockera nos données dans data
+    var data = [];
+
+    //bornes des valeurs de température
+    var t_min,t_max;
+    //bornes des valeurs de vitesse du vent
+    var ff_min,ff_max;
+
+    /**
+     * méthode qui renvoie les bornes d'une clé sur un objet data
+     * @param data le set de données
+     * @param key la clé dont on veut récupérer les minimums/maximum
+     * @returns {*[]} un tableau contenant les bornes minimums/maximum de la clé
+     */
+    function getBounds( data, key )
+    {
+        var min = Math.pow( 2, 53 );
+        var max = -Math.pow( 2, 53 );
+
+        data.forEach(function(obj) {
+
+            min = Math.min( min, obj[key] );
+            max = Math.max( max, obj[key] );
+
+        });
+        return [min, max];
+    }
+
+    function onCSVReady( result )
+    {
+
+        data = result;
+
+        var bounds = getBounds( data, 't' );
+        t_min = bounds[0];
+        t_max = bounds[1];
+
+        bounds = getBounds( data, 'ff' );
+        ff_min = bounds[0];
+        ff_max = bounds[1];
+
+        console.log( 'temperatures: t_min', t_min, 't_max', t_max );
+        console.log( 'vent: ff_min', ff_min, 'ff_max', ff_max );
+
+
+        draw();
+
+    }
+
+    function graduation( p0, p1, count, width )
+    {
+        G.line( p0, p1 );
+        var p = new Point();
+        var n = new Point( -( p1.y - p0.y ),  ( p1.x - p0.x ) );
+        n.normalize( width || 5 );
+
+        for( var i = 0; i <= count; i++ )
+        {
+            var t = i/count;
+            p.x = lerp( t, p0.x, p1.x );
+            p.y = lerp( t, p0.y, p1.y );
+            G.line( p, Point.add( p,n ) );
+        }
+
+    }
+
+    function getPositionAt( points, t )
+    {
+
+        var length = points.length-1;
+        var i0 = Math.floor( length * t );
+        i0 = i0 < length - 1 ? i0 : length - 1;
+        var i1 = Math.min( i0 + 1, length );
+
+        var delta = 1 / length;
+        var nt =  ( t - ( i0 * delta ) ) / delta;
+
+        return p = new Point(
+            lerp( nt, points[i0].x, points[i1].x ),
+            lerp( nt, points[i0].y, points[i1].y )
+        );
+    }
+
+    function draw()
+    {
+        requestAnimationFrame(draw);
+
+        ctx.restore();
+        ctx.save();
+        ctx.clearRect(0,0,w,h);
+
+
+        var width = 400;
+        var height = 300;
+
+        canvas.width = width + 5;
+        canvas.height = height + 5;
+
+
+        ctx.translate( 5,0 );
+
+        var p0 = new Point(0,0);
+        var p1 = new Point(0,height);
+        var p2 = new Point(width, height );
+
+        ctx.strokeStyle = "#DDD";
+        graduation( p0, p1, 10, 5 );
+        graduation( p1, p2, data.length, 5 );
+
+
+        //on va mapper les valeurs des points entre leurs bornes et le rectangle
+        var temperatures = [];
+        var winds = [];
+        var x, y;
+        var marginX = 0;
+        var marginY = 50;
+
+        data.forEach( function( obj, i )
+        {
+
+            //espacement régulier en X
+            x = map( i, 0, data.length - 1, marginX, width - marginX );
+
+            //mappe la valeur T de l'objet en cours entre t_min / t_max
+            y = map( obj.t, t_min, t_max, height - marginY, marginY );
+            temperatures.push( new Point( x, y ) );
+
+            //mappe la valeur FF de l'objet en cours entre ff_min / f_max
+            y = map( obj.ff, ff_min, ff_max, height - marginY, marginY );
+            winds.push( new Point( x, y ) );
+
+        });
+
+        //trace le graphe des températures en bleu
+        ctx.fillStyle = ctx.strokeStyle = "#09C";
+        G.polyline( temperatures );
+        //temperatures.forEach(function( p ){ G.disc(p.x, p.y,2 );} );
+
+        //trace le graphe des vitesse du vent en rouge
+        ctx.fillStyle = ctx.strokeStyle = "#F00";
+        G.polyline(  winds );
+        //winds.forEach(function( p ){ G.disc(p.x, p.y,2 );} );
+
+        return;
+
+        var t = .5 + Math.sin( Date.now() *.0001 ) * .5;
+        var p = getPositionAt( winds, t );
+        G.disc(p, 5);
+
+        var o = getPositionAt( [p1, p2], t );
+        G.line(p, o);
+
+        return;
+
+        for( var i = 0; i < 100; i++)winds.push( new Point( cx-400 + Math.random()* 50, cy-200 + Math.random()* 50))
+        var Kmeans = kmeans.compute( winds, 3 );
+        var centroids = Kmeans.centroids;
+
+        ctx.fillStyle = ctx.strokeStyle = "#FC0";
+        var points = Kmeans.points;
+        points.forEach(function( p ){ G.disc(p.x, p.y,2 );G.line( p, centroids[ p.centroid ] )} );
+
+        ctx.fillStyle = ctx.strokeStyle = "#F00";
+        centroids.forEach(function( p ){ G.disc(p.x, p.y, 2 );} );
+
+
+//        console.table( centroids );
+        //console.table( points );
+
+    }
+
+    var mouse = new Point();
+    function onMove(e)
+    {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    }
+    window.addEventListener('mousemove', onMove, false );
+
+
+</script>
+</body>
+</html>
