@@ -34,6 +34,7 @@
 <canvas id="ctx1"></canvas>
 <canvas id="ctx2"></canvas>
 <canvas id="ctx3"></canvas>
+<canvas id="ctx4"></canvas>
 
 <script>
 
@@ -54,7 +55,8 @@
         ctx1 = document.getElementById("ctx1").getContext( "2d" );
         ctx2 = document.getElementById("ctx2").getContext( "2d" );
         ctx3 = document.getElementById("ctx3").getContext( "2d" );
-        ctxs = [ ctx0, ctx1, ctx2, ctx3 ];
+        ctx4 = document.getElementById("ctx4").getContext( "2d" );
+        ctxs = [ ctx0, ctx1, ctx2, ctx3, ctx4 ];
 
         loader.load( "synop.2015102115.csv", onCSVReady );
     };
@@ -226,11 +228,7 @@
             ctx1.fillRect( p.x, p.y, w, h );
 
         } );
-//        ctx1.lineWidth = 3;
-//        ctx1.lineJoin = "round";
-//        ctx1.fillStyle = ctx1.strokeStyle = "#CCC";
-//        G.polyline( temperatures );
-//        G.polyline(  winds );
+
 
 
         G.ctx = ctx2;
@@ -241,11 +239,11 @@
 
         var t = .5 + Math.sin( Date.now() *.0005 ) * .5;
         var p = getPositionAt( temperatures, t );
-        G.disc(p, 5);
+        G.disc(p, 2 );
 
-//        return;
 
-//        for( var i = 0; i < 100; i++)winds.push( new Point( cx-400 + Math.random()* 50, cy-200 + Math.random()* 50))
+
+
         var Kmeans = kmeans.compute( winds.concat( temperatures ), 10 );
         var centroids = Kmeans.centroids;
 
@@ -258,6 +256,44 @@
         centroids.forEach(function( p ){ G.disc(p.x, p.y, p.items );} );
 
 
+
+        var polar = [];
+        G.ctx = ctx4;
+
+        ctx4.setTransform(1,0,0,1,0, 0);
+        ctx4.clearRect(0,0,ctx4.canvas.width, ctx4.canvas.height);
+        var rin = 50;
+        var rout = 150;
+
+        ctx4.strokeStyle = "#DDD";
+    //        ctx4.lineWidth = 2;
+    //        G.circle( width/2, height/2, lerp(.5, rin, rout ) );
+        ctx4.lineWidth = 1;
+        G.circle( width/2, height/2, rin );
+        G.circle( width/2, height/2, rout );
+
+        ctx4.strokeStyle = "#f00";
+        ctx4.beginPath();
+        data.forEach( function( obj, i )
+        {
+            var r = map( obj.t, t_min, t_max, rin, rout );
+
+            var a = i / data.length * PI2;
+            var p = new Point( width / 2 + Math.cos( a )*r, height / 2 + Math.sin( a )*r );
+            polar.push( p );
+            ctx4.lineTo(p.x, p.y );
+
+        } );
+        ctx4.closePath();
+        ctx4.stroke();
+
+
+        ctx4.strokeStyle = "#09C";
+        G.polyline( CatmullRom.compute( polar,.1, true ) );
+
+
+        ctx4.strokeStyle = "#FC0";
+        G.polyline( simplify.compute( quadratic.compute( polar,.1, true ), 40 ) );
 
 
     }
