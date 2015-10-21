@@ -246,7 +246,7 @@
 //        return;
 
 //        for( var i = 0; i < 100; i++)winds.push( new Point( cx-400 + Math.random()* 50, cy-200 + Math.random()* 50))
-        var Kmeans = kmeans.compute( winds.concat( temperatures ), 3 );
+        var Kmeans = kmeans.compute( winds.concat( temperatures ), 10 );
         var centroids = Kmeans.centroids;
 
         G.ctx = ctx3;
@@ -257,7 +257,7 @@
         ctx3.fillStyle = ctx3.strokeStyle = "#F00";
         centroids.forEach(function( p ){ G.disc(p.x, p.y, p.items );} );
 
-        
+
 
 
     }
