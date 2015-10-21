@@ -30,6 +30,11 @@
 <script src="utils/quadratic.js"></script>
 <script src="utils/kmeans.js"></script>
 
+<canvas id="ctx0"></canvas>
+<canvas id="ctx1"></canvas>
+<canvas id="ctx2"></canvas>
+<canvas id="ctx3"></canvas>
+
 <script>
 
     /*
@@ -43,6 +48,14 @@
     //on charge le CSV une fois qu ela page est chargée
     window.onload = function()
     {
+        document.body.removeChild( canvas );
+
+        ctx0 = document.getElementById("ctx0").getContext( "2d" );
+        ctx1 = document.getElementById("ctx1").getContext( "2d" );
+        ctx2 = document.getElementById("ctx2").getContext( "2d" );
+        ctx3 = document.getElementById("ctx3").getContext( "2d" );
+        ctxs = [ ctx0, ctx1, ctx2, ctx3 ];
+
         loader.load( "synop.2015102115.csv", onCSVReady );
     };
 
@@ -51,6 +64,9 @@
 
     //on stockera nos données dans data
     var data = [];
+
+    var ctx0, ctx1, ctx2, ctx3, ctxs;
+
 
     //bornes des valeurs de température
     var t_min,t_max;
@@ -136,27 +152,30 @@
     {
         requestAnimationFrame(draw);
 
-        ctx.restore();
-        ctx.save();
-        ctx.clearRect(0,0,w,h);
-
 
         var width = 400;
         var height = 300;
-
-        canvas.width = width + 5;
-        canvas.height = height + 5;
-
-
-        ctx.translate( 5,0 );
 
         var p0 = new Point(0,0);
         var p1 = new Point(0,height);
         var p2 = new Point(width, height );
 
-        ctx.strokeStyle = "#DDD";
-        graduation( p0, p1, 10, 5 );
-        graduation( p1, p2, data.length, 5 );
+        ctxs.forEach(function(ctx){
+
+            ctx.restore();
+            ctx.save();
+            ctx.clearRect(0,0,w,h);
+            ctx.canvas.width = width + 15;
+            ctx.canvas.height = height + 5;
+
+            ctx.strokeStyle = "#DDD";
+            ctx.translate( 5, 1 );
+
+            G.ctx = ctx;
+            graduation( p0, p1, 10, 5 );
+            graduation( p1, p2, data.length, 5 );
+
+        });
 
 
         //on va mapper les valeurs des points entre leurs bornes et le rectangle
@@ -170,7 +189,7 @@
         {
 
             //espacement régulier en X
-            x = map( i, 0, data.length - 1, marginX, width - marginX );
+            x = map( i, 0, data.length, marginX, width - marginX );
 
             //mappe la valeur T de l'objet en cours entre t_min / t_max
             y = map( obj.t, t_min, t_max, height - marginY, marginY );
@@ -182,41 +201,64 @@
 
         });
 
+
         //trace le graphe des températures en bleu
-        ctx.fillStyle = ctx.strokeStyle = "#09C";
+        ctx0.fillStyle = ctx0.strokeStyle = "#09C";
+        G.ctx = ctx0;
         G.polyline( temperatures );
-        //temperatures.forEach(function( p ){ G.disc(p.x, p.y,2 );} );
+//        temperatures.forEach(function( p ){ G.disc(p.x, p.y,2 );} );
 
         //trace le graphe des vitesse du vent en rouge
-        ctx.fillStyle = ctx.strokeStyle = "#F00";
+        ctx0.fillStyle = ctx0.strokeStyle = "#F00";
         G.polyline(  winds );
-        //winds.forEach(function( p ){ G.disc(p.x, p.y,2 );} );
+        winds.forEach(function( p ){ G.disc(p.x, p.y,2 );} );
 
-        return;
 
-        var t = .5 + Math.sin( Date.now() *.0001 ) * .5;
-        var p = getPositionAt( winds, t );
+
+        //trace le graphe des vitesse du vent en rouge
+        G.ctx = ctx1;
+        winds.forEach(function( p,i  ){
+
+            var o = temperatures[i];
+            var w = width / data.length;
+            var h = o.y - p.y;
+            ctx1.fillStyle = h < 0 ? "#09C" : "#FC0";
+            ctx1.fillRect( p.x, p.y, w, h );
+
+        } );
+//        ctx1.lineWidth = 3;
+//        ctx1.lineJoin = "round";
+//        ctx1.fillStyle = ctx1.strokeStyle = "#CCC";
+//        G.polyline( temperatures );
+//        G.polyline(  winds );
+
+
+        G.ctx = ctx2;
+        ctx2.strokeStyle = "#DDD";
+        graduation( p1, p2, data.length, -height );
+        ctx2.strokeStyle = "#F00";
+        G.polyline( temperatures );
+
+        var t = .5 + Math.sin( Date.now() *.0005 ) * .5;
+        var p = getPositionAt( temperatures, t );
         G.disc(p, 5);
 
-        var o = getPositionAt( [p1, p2], t );
-        G.line(p, o);
+//        return;
 
-        return;
-
-        for( var i = 0; i < 100; i++)winds.push( new Point( cx-400 + Math.random()* 50, cy-200 + Math.random()* 50))
-        var Kmeans = kmeans.compute( winds, 3 );
+//        for( var i = 0; i < 100; i++)winds.push( new Point( cx-400 + Math.random()* 50, cy-200 + Math.random()* 50))
+        var Kmeans = kmeans.compute( winds.concat( temperatures ), 3 );
         var centroids = Kmeans.centroids;
 
-        ctx.fillStyle = ctx.strokeStyle = "#FC0";
+        G.ctx = ctx3;
+        ctx3.fillStyle = ctx3.strokeStyle = "#09C";
         var points = Kmeans.points;
         points.forEach(function( p ){ G.disc(p.x, p.y,2 );G.line( p, centroids[ p.centroid ] )} );
 
-        ctx.fillStyle = ctx.strokeStyle = "#F00";
-        centroids.forEach(function( p ){ G.disc(p.x, p.y, 2 );} );
+        ctx3.fillStyle = ctx3.strokeStyle = "#F00";
+        centroids.forEach(function( p ){ G.disc(p.x, p.y, p.items );} );
 
+        
 
-//        console.table( centroids );
-        //console.table( points );
 
     }
 
