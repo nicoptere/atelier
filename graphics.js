@@ -151,6 +151,7 @@ var Graphics = function( ctx )
         exports.ctx.fill();
 
     };
+
     exports.quadCurve = function( a,b,c )
     {
         exports.ctx.beginPath();
@@ -165,6 +166,26 @@ var Graphics = function( ctx )
         exports.ctx.moveTo(a.x, a.y );
         exports.ctx.bezierCurveTo(b.x, b.y, c.x, c.y, d.x, d.y );
         exports.ctx.stroke();
+    };
+
+    exports.graduation = function( x0,y0, x1,y1, count, width )
+    {
+        //permet de passer un point au lieu de x, y
+        if( x0.x != null && y0.x != null )return exports.graduation( x0.x, x0.y, y0.x, y0.y, x1, y1 );
+
+        G.line(  x0,y0, x1,y1 );
+        var p = new Point();
+        var n = new Point( -( y1 - y0 ),  ( x1 - x0 ) );
+        n.normalize( width || 5 );
+
+        for( var i = 0; i <= count; i++ )
+        {
+            var t = i/count;
+            p.x = lerp( t, x0, x1 );
+            p.y = lerp( t, y0, y1 );
+            G.line( p, Point.add( p,n ) );
+        }
+
     };
 
 

@@ -37,7 +37,20 @@ Point.prototype =
 
 Point.add = function( a, b ){return new Point( a.x + b.x, a.y + b.y );};
 Point.sub = function( a, b ){return new Point( a.x - b.x, a.y - b.y );};
-Point.fromAngleDistance = function( angle, distance ){
-    return new Point( Math.cos( angle ) * distance, Math.sin( angle ) * distance );
+Point.fromAngleDistance = function( angle, distance ){return new Point( Math.cos( angle ) * distance, Math.sin( angle ) * distance );}
+
+function getPositionAt( points, t ) {
+
+    var length = points.length-1;
+    var i0 = Math.floor( length * t );
+    i0 = i0 < length - 1 ? i0 : length - 1;
+    var i1 = Math.min( i0 + 1, length );
+
+    var delta = 1 / length;
+    var nt =  ( t - ( i0 * delta ) ) / delta;
+    return p = new Point(
+        lerp( nt, points[i0].x, points[i1].x ),
+        lerp( nt, points[i0].y, points[i1].y )
+    );
 }
 

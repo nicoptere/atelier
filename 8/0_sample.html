@@ -9,10 +9,14 @@
         {
             width:100%;
             height:100%;
-            overflow: hidden;
             margin:0;
             padding:0;
-            /*background-color: #EEE;*/
+        }
+        canvas, textarea
+        {
+            vertical-align: middle;
+            margin: 25px;
+            padding: 20px;
         }
 
     </style>
@@ -35,11 +39,155 @@
 
 
 
-<canvas id="ctx0"></canvas>
-<canvas id="ctx1"></canvas>
-<canvas id="ctx2"></canvas>
-<canvas id="ctx3"></canvas>
-<canvas id="ctx4"></canvas>
+<textarea id="ta0" cols="80">//dessine les séries de valeurs sous forme de lignes
+function simpleGraph( ctx, values0, values1 )
+{
+    //assigne le contexte à l'utilistaire de dessin
+    G.ctx = ctx;
+
+    //trace le graphe des températures en bleu
+    ctx.strokeStyle = "#09C";
+    G.polyline( values0 );
+
+    //trace le graphe des vitesse du vent en rouge
+    ctx.strokeStyle = "#F00";
+    G.polyline(  values1 );
+}</textarea><canvas id="ctx0"></canvas><br>
+<textarea id="ta1" cols="80">//trace la différence entre vent et température
+function compareHistogram( ctx, values0, values1 ){
+
+    //assigne le contexte à l'utilistaire de dessin
+    G.ctx = ctx;
+
+    values0.forEach(function( v0,i  ){
+
+        //récupère la valeur de values1 à cet index
+        var v1 = values1[ i ];
+
+        //si la valeur 0 est plus grande que la valeur 1
+        var h = v1.y - v0.y;
+        if( h < 0 ) {
+            //dessine un bloc jaune
+            ctx.fillStyle = "#FC0";
+        }else{
+            //sinon dessine un bloc bleu
+            ctx.fillStyle = "#09C";
+        }
+        ctx.fillRect( v0.x, v0.y, width / data.length, h );
+
+    } );
+}</textarea><canvas id="ctx1"></canvas><br>
+<textarea id="ta2" cols="80">//dessine une valeur normalisée T le long d'une série de segments
+function plotTime(ctx, values, t )
+{
+    //assigne le contexte à l'utilistaire de dessin
+    G.ctx = ctx;
+
+    //dessine une ligne graduée
+    ctx.fillStyle = ctx.strokeStyle = "#EEE";
+    G.graduation( 0,height, width-1, height, data.length, -20 );
+
+    var id = ( Math.floor( ( values.length - 1 ) * t ) );
+    if( id < 0 ) id = 0;
+
+    //dessine le rectangle où se trouve le point en gris
+    ctx.fillRect( values[ id ].x, 0, width / data.length, height );
+
+    //trace la courbe des températures en noir
+    ctx.strokeStyle = "#666";
+    G.polyline( values );
+
+    //dessine le point au temps T sur la courbe
+    ctx.fillStyle = "#F00";
+    var p = getPositionAt( values, t );
+    G.disc( p, 2 );
+
+    //dessine en bleu les points de la courbe
+    //entre lesquels se trouve le point p
+    ctx.fillStyle = "#09C";
+
+    p = values[ id ];
+    G.disc(p, 2 );
+
+    p = values[ Math.min( id +  1, values.length - 1 ) ];
+    G.disc(p, 2 );
+
+}</textarea><canvas id="ctx2"></canvas><br>
+<textarea id="ta3" cols="80">//dessine les K-moyens
+function plotKmeans( ctx, values0, values1 ){
+
+    //assigne le contexte à l'utilistaire de dessin
+    G.ctx = ctx;
+
+    //graphes les valeurs en gris clair
+    ctx.strokeStyle = "#CCC";
+    G.polyline( values0 );
+    G.polyline( values1 );
+
+    //crée une palette de couleurs
+    var colors = [ "#ACE4FF", "#F5EB4E", "#A6F793", "#FF5294" ];
+
+    //concatène les valeurs des 2 tablkeaux
+    var values = values0.concat( values1 );
+
+    //calcule et stocke les K-moyens une fois pour toutes
+    if( Kmeans == null )
+    {
+        Kmeans = kmeans.compute( values, colors.length, 1000 );
+    }
+
+    var centroids = Kmeans.centroids;
+    var points = Kmeans.points;
+    //dessine les clusters reliés à leur centroids
+    points.forEach(function( p ){
+        ctx.fillStyle = ctx.strokeStyle = colors[ p.centroid ];
+        G.disc(p.x, p.y,2 );
+        G.line( p, centroids[ p.centroid ] )
+    } );
+
+    //dessine les centroids
+    centroids.forEach(function( p, i )
+    {
+        ctx.fillStyle = ctx.strokeStyle = colors[i];
+        G.disc(p.x, p.y, p.items / 2 );
+    } );
+
+}</textarea><canvas id="ctx3"></canvas><br>
+<textarea id="ta4" cols="80">//dessine un graphe polaire des valeurs
+function plotPolar(ctx, inRadius, outRadius, data )
+{
+
+    //assigne le contexte à l'utilistaire de dessin
+    G.ctx = ctx;
+
+    //dessine des portions d'anneau en gris
+    ctx.strokeStyle = "#ddd";
+    data.forEach( function( obj, i ) {
+        var a = i / data.length * PI2;
+        var span = a + PI2 / data.length;
+        G.strokeRing(width / 2, height / 2, inRadius, outRadius, a, span);
+    });
+
+    //dessine des portions d'anneau en bleu
+    ctx.strokeStyle = ctx.fillStyle = "#09C";
+    data.forEach( function( obj, i ){
+        var a =  i / data.length * PI2;
+        var span = a + PI2 / data.length;
+        var r = map( obj.t, t_min, t_max, inRadius, outRadius );
+        G.fillRing( width/2, height/2, inRadius,r, a, span  );
+        G.strokeRing( width/2, height/2, inRadius,r, a, span  );
+    });
+
+    //dessine des portions d'anneau en jaune
+    ctx.strokeStyle = ctx.fillStyle = "#FC0";
+    data.forEach( function( obj, i ) {
+        var a = i / data.length * PI2;
+        var span = a + PI2 / data.length;
+        var r = map(obj.ff, ff_min, ff_max, inRadius, outRadius);
+        G.fillRing(width / 2, height / 2, inRadius, r, a, span);
+        G.strokeRing(width / 2, height / 2, inRadius, r, a, span);
+    });
+}</textarea><canvas id="ctx4"></canvas><br>
 
 <script>
 
@@ -51,117 +199,88 @@
      le détail du format se trouve dans le pdf doc_parametres_synop_168.pdf
      */
 
+    //on stockera nos données dans data
+    var data = [];
+
+    //bornes des valeurs de température
+    var t_min,t_max;
+
+    //bornes des valeurs de vitesse du vent
+    var ff_min,ff_max;
+
+    //stocke les K-moyens (un peu long à calculer)
+    var Kmeans;
+
+    //largeur / hauteur des canvas
+    // c'est la même pour tous mais on pourrait en avoir des différentes pour chaque ou récupérer les valeurs des canvas eux mêmes
+    var width = 400;
+    var height = 300;
+
+    //on instantie l'utilitaire de dessin sans lui passer de contexte
+    var G = new Graphics();
+
+    //on maintient une liste de références vers X contextes
+    var ctx0, ctx1, ctx2, ctx3, ctx4, ctxs;
+
+
     //on charge le CSV une fois qu ela page est chargée
     window.onload = function()
     {
+
         document.body.removeChild( canvas );
 
+        //on récupère les contextes d'éléments canvas présents dans la page
         ctx0 = document.getElementById("ctx0").getContext( "2d" );
         ctx1 = document.getElementById("ctx1").getContext( "2d" );
         ctx2 = document.getElementById("ctx2").getContext( "2d" );
         ctx3 = document.getElementById("ctx3").getContext( "2d" );
         ctx4 = document.getElementById("ctx4").getContext( "2d" );
+
+        //liste de références pour nettoyer tout le mponde en boucle
         ctxs = [ ctx0, ctx1, ctx2, ctx3, ctx4 ];
 
-        loader.load( "synop.2015102115.csv", onCSVReady );
+        //on récupère les textareas présents dans la page
+        ta0 = document.getElementById("ta0");
+        ta1 = document.getElementById("ta1");
+        ta2 = document.getElementById("ta2");
+        ta3 = document.getElementById("ta3");
+        ta4 = document.getElementById("ta4");
+        tas = [ ta0, ta1, ta2, ta3, ta4 ];
+
+        tas.forEach(function( ta ){
+            ta.rows = ta.innerHTML.split( '\n').length;
+        });
+
+        //on charge le CSV
+        loader.load( "synop.2015102115.csv", onCSVReady, ";" );
     };
 
-    //on branche l'utilitaire de dessin sur le contexte
-    var G = new Graphics( ctx );
-
-    //on stockera nos données dans data
-    var data = [];
-
-    var ctx0, ctx1, ctx2, ctx3, ctxs;
-
-
-    //bornes des valeurs de température
-    var t_min,t_max;
-    //bornes des valeurs de vitesse du vent
-    var ff_min,ff_max;
-
-    /**
-     * méthode qui renvoie les bornes d'une clé sur un objet data
-     * @param data le set de données
-     * @param key la clé dont on veut récupérer les minimums/maximum
-     * @returns {*[]} un tableau contenant les bornes minimums/maximum de la clé
-     */
-    function getBounds( data, key )
-    {
-        var min = Math.pow( 2, 53 );
-        var max = -Math.pow( 2, 53 );
-
-        data.forEach(function(obj) {
-
-            min = Math.min( min, obj[key] );
-            max = Math.max( max, obj[key] );
-
-        });
-        return [min, max];
-    }
 
     function onCSVReady( result )
     {
 
         data = result;
 
-        var bounds = getBounds( data, 't' );
+        var bounds = metrics.getBounds( data, 't' );
         t_min = bounds[0];
         t_max = bounds[1];
 
-        bounds = getBounds( data, 'ff' );
+        bounds = metrics.getBounds( data, 'ff' );
         ff_min = bounds[0];
         ff_max = bounds[1];
 
+
         console.log( 'temperatures: t_min', t_min, 't_max', t_max );
         console.log( 'vent: ff_min', ff_min, 'ff_max', ff_max );
-
 
         draw();
 
     }
 
-    function graduation( p0, p1, count, width )
-    {
-        G.line( p0, p1 );
-        var p = new Point();
-        var n = new Point( -( p1.y - p0.y ),  ( p1.x - p0.x ) );
-        n.normalize( width || 5 );
-
-        for( var i = 0; i <= count; i++ )
-        {
-            var t = i/count;
-            p.x = lerp( t, p0.x, p1.x );
-            p.y = lerp( t, p0.y, p1.y );
-            G.line( p, Point.add( p,n ) );
-        }
-
-    }
-
-    function getPositionAt( points, t )
-    {
-
-        var length = points.length-1;
-        var i0 = Math.floor( length * t );
-        i0 = i0 < length - 1 ? i0 : length - 1;
-        var i1 = Math.min( i0 + 1, length );
-
-        var delta = 1 / length;
-        var nt =  ( t - ( i0 * delta ) ) / delta;
-
-        return p = new Point(
-            lerp( nt, points[i0].x, points[i1].x ),
-            lerp( nt, points[i0].y, points[i1].y )
-        );
-    }
 
     function draw()
     {
         requestAnimationFrame(draw);
-
-
-        var width = 400;
-        var height = 300;
 
         var p0 = new Point(0,0);
         var p1 = new Point(0,height);
@@ -172,15 +291,10 @@
             ctx.restore();
             ctx.save();
             ctx.clearRect(0,0,w,h);
-            ctx.canvas.width = width + 15;
-            ctx.canvas.height = height + 5;
+            ctx.canvas.width = width;
+            ctx.canvas.height = height;
 
             ctx.strokeStyle = "#DDD";
-            ctx.translate( 5, 1 );
-
-            G.ctx = ctx;
-            graduation( p0, p1, 10, 5 );
-            graduation( p1, p2, data.length, 5 );
 
         });
 
@@ -192,11 +306,10 @@
         var marginX = 0;
         var marginY = 50;
 
-        data.forEach( function( obj, i )
-        {
+        data.forEach( function( obj, i ) {
 
             //espacement régulier en X
-            x = map( i, 0, data.length, marginX, width - marginX ) + ( width / data.length ) * .5;
+            x = map( i, 0, data.length, marginX, width - marginX );// + ( width / data.length ) * .5;
 
             //mappe la valeur T de l'objet en cours entre t_min / t_max
             y = map( obj.t, t_min, t_max, height - marginY, marginY );
@@ -209,73 +322,164 @@
         });
 
 
-        //trace le graphe des températures en bleu
-        ctx0.fillStyle = ctx0.strokeStyle = "#09C";
-        G.ctx = ctx0;
-        G.polyline( temperatures );
-//        temperatures.forEach(function( p ){ G.disc(p.x, p.y,2 );} );
+        simpleGraph( ctx0, temperatures, winds );
 
-        //trace le graphe des vitesse du vent en rouge
-        ctx0.fillStyle = ctx0.strokeStyle = "#F00";
-        G.polyline(  winds );
-        winds.forEach(function( p ){ G.disc(p.x, p.y,2 );} );
+        compareHistogram( ctx1, temperatures, winds );
 
 
+        //une variable de temps qui oscille
+        var t = .5 + Math.sin( Date.now() *.0005 ) * .5;
+        plotTime( ctx2, winds, t );
 
-        //trace le graphe des vitesse du vent en rouge
-        G.ctx = ctx1;
-        winds.forEach(function( p,i  ){
 
-            var o = temperatures[i];
-            var w = width / data.length;
-            var h = o.y - p.y;
-            ctx1.fillStyle = h < 0 ? "#09C" : "#FC0";
-            ctx1.fillRect( p.x, p.y, w, h );
+        plotKmeans( ctx3, temperatures, winds );
+
+
+        //rayon intérieur et extérieur du cercle
+        var inRadius = 25 + 75 * t;//le cercle intérieur bouge
+        var outRadius = height / 2;
+        plotPolar( ctx4, inRadius, outRadius, data );
+
+
+    }
+
+    ////////////////////////////////////////////////////
+
+    // méthodes décrites dans la page
+
+    ////////////////////////////////////////////////////
+
+
+
+
+    //dessine les séries de valeurs sous forme de lignes
+    function simpleGraph( ctx, values0, values1 )
+    {
+        //assigne le contexte à l'utilistaire de dessin
+        G.ctx = ctx;
+
+        //trace le graphe des températures en rouge
+        ctx.strokeStyle = "#F00";
+        G.polyline( values0 );
+
+        //scatterplot des vitesse du vent en bleu
+        ctx.fillStyle = "#09C";
+        values1.forEach( function( p ){G.disc(p, 2);} );
+    }
+
+    //trace la différence entre vent et température
+    function compareHistogram( ctx, values0, values1 ){
+
+        //assigne le contexte à l'utilistaire de dessin
+        G.ctx = ctx;
+
+        values0.forEach(function( v0,i  ){
+
+            //récupère la valeur de values1 à cet index
+            var v1 = values1[ i ];
+
+            //si la valeur 0 est plus grande que la valeur 1
+            var h = v1.y - v0.y;
+            if( h < 0 ) {
+                //dessine un bloc jaune
+                ctx.fillStyle = "#FC0";
+            }else{
+                //sinon dessine un bloc bleu
+                ctx.fillStyle = "#09C";
+            }
+            ctx.fillRect( v0.x, v0.y, width / data.length, h );
 
         } );
+    }
 
+    //dessine une valeur normalisée T le long d'une série de segments
+    function plotTime(ctx, values, t )
+    {
+        //assigne le contexte à l'utilistaire de dessin
+        G.ctx = ctx;
 
+        //dessine une ligne graduée
+        ctx.fillStyle = ctx.strokeStyle = "#EEE";
+        G.graduation( 0,height, width-1, height, data.length, -20 );
 
-        G.ctx = ctx2;
-        ctx2.strokeStyle = "#DDD";
-        graduation( p1, p2, data.length, -height );
-        ctx2.strokeStyle = "#F00";
-        G.polyline( temperatures );
+        var id = ( Math.floor( ( values.length - 1 ) * t ) );
+        if( id < 0 ) id = 0;
 
-        var t = .5 + Math.sin( Date.now() *.0005 ) * .5;
-        var p = getPositionAt( temperatures, t );
+        //dessine le rectangle où se trouve le point en gris
+        ctx.fillRect( values[ id ].x, 0, width / data.length, height );
+
+        //trace la courbe des températures en noir
+        ctx.strokeStyle = "#666";
+        G.polyline( values );
+
+        //dessine le point au temps T sur la courbe
+        ctx.fillStyle = "#F00";
+        var p = getPositionAt( values, t );
+        G.disc( p, 2 );
+
+        //dessine en bleu les points de la courbe
+        //entre lesquels se trouve le point p
+        ctx.fillStyle = "#09C";
+
+        p = values[ id ];
         G.disc(p, 2 );
 
+        p = values[ Math.min( id +  1, values.length - 1 ) ];
+        G.disc(p, 2 );
 
+    }
 
+    //dessine les K-moyens
+    function plotKmeans( ctx, values0, values1 ){
 
-        var Kmeans = kmeans.compute( winds.concat( temperatures ), Math.sqrt( data.length / 2 ), 1 );
+        //assigne le contexte à l'utilistaire de dessin
+        G.ctx = ctx;
+
+        //graphes les valeurs en gris clair
+        ctx.strokeStyle = "#CCC";
+        G.polyline( values0 );
+        G.polyline( values1 );
+
+        //crée une palette de couleurs
+        var colors = [ "#ACE4FF", "#F5EB4E", "#A6F793", "#FF5294" ];
+
+        //concatène les valeurs des 2 tablkeaux
+        var values = values0.concat( values1 );
+
+        //calcule et stocke les K-moyens une fois pour toutes (un peu long à calculer)
+        if( Kmeans == null )
+        {
+            Kmeans = kmeans.compute( values, colors.length, 1000 );
+        }
+
         var centroids = Kmeans.centroids;
-
-        G.ctx = ctx3;
-        ctx3.fillStyle = ctx3.strokeStyle = "#09C";
         var points = Kmeans.points;
-        points.forEach(function( p ){ G.disc(p.x, p.y,2 );G.line( p, centroids[ p.centroid ] )} );
+        //dessine les clusters reliés à leur centroids
+        points.forEach(function( p ){
+            ctx.fillStyle = ctx.strokeStyle = colors[ p.centroid ];
+            G.disc(p.x, p.y,2 );
+            G.line( p, centroids[ p.centroid ] )
+        } );
 
-        ctx3.fillStyle = ctx3.strokeStyle = "#F00";
-        centroids.forEach(function( p ){ G.disc(p.x, p.y, p.items );} );
+        //dessine les centroids
+        centroids.forEach(function( p, i )
+        {
+            ctx.fillStyle = ctx.strokeStyle = colors[i];
+            G.disc(p.x, p.y, p.items / 2 );
+        } );
 
+    }
 
+    //dessine un graphe polaire des valeurs
+    function plotPolar(ctx, inRadius, outRadius, data )
+    {
 
+        G.ctx = ctx;
+        //dessine un graphe des valeurs polarisées
+        /*
         var polar = [];
-        G.ctx = ctx4;
-
-        ctx4.setTransform(1,0,0,1,0, 0);
-        ctx4.clearRect(0,0,ctx4.canvas.width, ctx4.canvas.height);
-        var rin = 25 + t * 75;
-        var rout = 150;
-
-        ctx4.strokeStyle = "#DDD";
-        G.circle( width/2, height/2, rin );
-        G.circle( width/2, height/2, rout );
-
-        ctx4.strokeStyle = "#f00";
-        ctx4.beginPath();
+        ctx.strokeStyle = "#f00";
+        ctx.beginPath();
         data.forEach( function( obj, i )
         {
             var r = map( obj.t, t_min, t_max, rin, rout );
@@ -283,60 +487,41 @@
             var a = i / data.length * PI2;
             var p = new Point( width / 2 + Math.cos( a )*r, height / 2 + Math.sin( a )*r );
             polar.push( p );
-            ctx4.lineTo(p.x, p.y );
+            ctx.lineTo(p.x, p.y );
 
         } );
 
-        ctx4.closePath();
-//        ctx4.stroke();
-//        return;
-//
-//        var simple = simplify.compute( polar, 50 );
-//
-//        ctx4.strokeStyle = "#FC0";
-//        G.polyline(  simple );
-//
-//
-        ctx4.fillStyle = "#09C";
-//        G.polyline( convexhull.compute( polar ), true );
-//
-//        var c = new Circle().minimumEnclosingCircle( polar );
-//        G.circle( c, c.r );
+        ctx.closePath();
+        ctx.stroke();
+        //*/
 
+        //dessine des portions d'anneau en gris
+        ctx.strokeStyle = "#ddd";
         data.forEach( function( obj, i ) {
             var a = i / data.length * PI2;
             var span = a + PI2 / data.length;
-
-            ctx4.strokeStyle = "#ddd";
-            G.strokeRing(width / 2, height / 2, rin, rout, a, span);
+            G.strokeRing(width / 2, height / 2, inRadius, outRadius, a, span);
         });
 
-        ctx4.strokeStyle = ctx4.fillStyle = "#09C";
-        data.forEach( function( obj, i )
-        {
+        //dessine des portions d'anneau en bleu
+        ctx.strokeStyle = ctx.fillStyle = "#09C";
+        data.forEach( function( obj, i ){
             var a =  i / data.length * PI2;
             var span = a + PI2 / data.length;
-            var r = map( obj.t, t_min, t_max, rin, rout );
-            G.fillRing( width/2, height/2, rin,r, a, span  );
-            G.strokeRing( width/2, height/2, rin,r, a, span  );
-
+            var r = map( obj.t, t_min, t_max, inRadius, outRadius );
+            G.fillRing( width/2, height/2, inRadius,r, a, span  );
+            G.strokeRing( width/2, height/2, inRadius,r, a, span  );
         });
 
-        ctx4.strokeStyle = ctx4.fillStyle = "#FC0";
+        //dessine des portions d'anneau en jaune
+        ctx.strokeStyle = ctx.fillStyle = "#FC0";
         data.forEach( function( obj, i ) {
-
             var a = i / data.length * PI2;
             var span = a + PI2 / data.length;
-            var r = map(obj.ff, ff_min, ff_max, rin, rout);
-            G.fillRing(width / 2, height / 2, rin, r, a, span);
-            G.strokeRing(width / 2, height / 2, rin, r, a, span);
-
+            var r = map(obj.ff, ff_min, ff_max, inRadius, outRadius);
+            G.fillRing(width / 2, height / 2, inRadius, r, a, span);
+            G.strokeRing(width / 2, height / 2, inRadius, r, a, span);
         });
-
-//        G.fillRing( width/2, height/2, 50,150, PI / 3, -PI / 4 );
-//        ctx4.strokeStyle = "#FC0";
-
-//        setTimeout( draw, 1 )
     }
 
     var mouse = new Point();
