@@ -32,171 +32,33 @@
 <script src="../geom.js"></script>
 <script src="../graphics.js"></script>
 <script src="loader.js"></script>
-<script src="utils/cardinal.js"></script>
-<script src="utils/catmullrom.js"></script>
-<script src="utils/simplify.js"></script>
-<script src="utils/quadratic.js"></script>
+
+<!--utilitaires géométriques-->
+<!--<script src="utils/cardinal.js"></script>-->
+<!--<script src="utils/catmullrom.js"></script>-->
+<!--<script src="utils/simplify.js"></script>-->
+<!--<script src="utils/quadratic.js"></script>-->
 <script src="utils/kmeans.js"></script>
 <script src="utils/convexhull.js"></script>
-<script src="utils/circle.js"></script>
+<!--<script src="utils/circle.js"></script>-->
 <script src="utils/metrics.js"></script>
 
+<!-- methodes de dessin -->
+<script src="plotters/simpleGraph.js"></script>
+<script src="plotters/compareHistogram.js"></script>
+<script src="plotters/plotTime.js"></script>
+<script src="plotters/plotKmeans.js"></script>
+<script src="plotters/plotPolar.js"></script>
+<script src="plotters/plotHull.js"></script>
 
 
-<textarea id="ta0" cols="80">//dessine les séries de valeurs sous forme de lignes
-function simpleGraph( ctx, values0, values1 )
-{
-    //assigne le contexte à l'utilistaire de dessin
-    G.ctx = ctx;
 
-    //trace le graphe des températures en bleu
-    ctx.strokeStyle = "#09C";
-    G.polyline( values0 );
-
-    //trace le graphe des vitesse du vent en rouge
-    ctx.strokeStyle = "#F00";
-    G.polyline(  values1 );
-}</textarea><canvas id="ctx0"></canvas><br>
-<textarea id="ta1" cols="80">//trace la différence entre vent et température
-function compareHistogram( ctx, values0, values1 ){
-
-    //assigne le contexte à l'utilistaire de dessin
-    G.ctx = ctx;
-
-    values0.forEach(function( v0,i  ){
-
-        //récupère la valeur de values1 à cet index
-        var v1 = values1[ i ];
-
-        //si la valeur 0 est plus grande que la valeur 1
-        var h = v1.y - v0.y;
-        if( h < 0 ) {
-            //dessine un bloc jaune
-            ctx.fillStyle = "#FC0";
-        }else{
-            //sinon dessine un bloc bleu
-            ctx.fillStyle = "#09C";
-        }
-        ctx.fillRect( v0.x, v0.y, width / data.length, h );
-
-    } );
-}</textarea><canvas id="ctx1"></canvas><br>
-<textarea id="ta2" cols="80">//dessine une valeur normalisée T le long d'une série de segments
-function plotTime(ctx, values, t )
-{
-    //assigne le contexte à l'utilistaire de dessin
-    G.ctx = ctx;
-
-    //dessine une ligne graduée
-    ctx.fillStyle = ctx.strokeStyle = "#EEE";
-    G.graduation( 0,height, width-1, height, data.length, -20 );
-
-    var id = ( Math.floor( ( values.length - 1 ) * t ) );
-    if( id < 0 ) id = 0;
-
-    //dessine le rectangle où se trouve le point en gris
-    ctx.fillRect( values[ id ].x, 0, width / data.length, height );
-
-    //trace la courbe des températures en noir
-    ctx.strokeStyle = "#666";
-    G.polyline( values );
-
-    //dessine le point au temps T sur la courbe
-    ctx.fillStyle = "#F00";
-    var p = getPositionAt( values, t );
-    G.disc( p, 2 );
-
-    //dessine en bleu les points de la courbe
-    //entre lesquels se trouve le point p
-    ctx.fillStyle = "#09C";
-
-    p = values[ id ];
-    G.disc(p, 2 );
-
-    p = values[ Math.min( id +  1, values.length - 1 ) ];
-    G.disc(p, 2 );
-
-}</textarea><canvas id="ctx2"></canvas><br>
-<textarea id="ta3" cols="80">//dessine les K-moyens
-function plotKmeans( ctx, values0, values1 ){
-
-    //assigne le contexte à l'utilistaire de dessin
-    G.ctx = ctx;
-
-    //arrière plan en gris foncé
-    ctx.fillStyle = "#333";
-    ctx.fillRect( 0,0,width, height);
-
-    //graphes les valeurs en gris plus clair
-    ctx.strokeStyle = "#666";
-    G.polyline( values0 );
-    G.polyline( values1 );
-
-    //crée une palette de couleurs
-    var colors = [ "#ACE4FF", "#F5EB4E", "#A6F793", "#FF5294" ];
-
-    //concatène les valeurs des 2 tablkeaux
-    var values = values0.concat( values1 );
-
-    //calcule et stocke les K-moyens une fois pour toutes
-    //(un peu long à calculer)
-    if( Kmeans == null )
-    {
-        Kmeans = kmeans.compute( values, colors.length, 1000 );
-    }
-
-    var centroids = Kmeans.centroids;
-    var points = Kmeans.points;
-    //dessine les clusters reliés à leur centroids
-    points.forEach(function( p ){
-        ctx.fillStyle = ctx.strokeStyle = colors[ p.centroid ];
-        G.disc(p.x, p.y,2 );
-        G.line( p, centroids[ p.centroid ] )
-    } );
-
-    //dessine les centroids
-    centroids.forEach(function( p, i )
-    {
-        ctx.fillStyle = ctx.strokeStyle = colors[i];
-        G.disc(p.x, p.y, p.items / 2 );
-    } );
-
-}</textarea><canvas id="ctx3"></canvas><br>
-<textarea id="ta4" cols="80">//dessine un graphe polaire des valeurs
-function plotPolar(ctx, inRadius, outRadius, data )
-{
-
-    //assigne le contexte à l'utilistaire de dessin
-    G.ctx = ctx;
-
-    //dessine des portions d'anneau en gris
-    ctx.strokeStyle = "#ddd";
-    data.forEach( function( obj, i ) {
-        var a = i / data.length * PI2;
-        var span = a + PI2 / data.length;
-        G.strokeRing(width / 2, height / 2, inRadius, outRadius, a, span);
-    });
-
-    //dessine des portions d'anneau en bleu
-    ctx.strokeStyle = ctx.fillStyle = "#09C";
-    data.forEach( function( obj, i ){
-        var a =  i / data.length * PI2;
-        var span = a + PI2 / data.length;
-        var r = map( obj.t, t_min, t_max, inRadius, outRadius );
-        G.fillRing( width/2, height/2, inRadius,r, a, span  );
-        G.strokeRing( width/2, height/2, inRadius,r, a, span  );
-    });
-
-    //dessine des portions d'anneau en jaune
-    ctx.strokeStyle = ctx.fillStyle = "#FC0";
-    data.forEach( function( obj, i ) {
-        var a = i / data.length * PI2;
-        var span = a + PI2 / data.length;
-        var r = map(obj.ff, ff_min, ff_max, inRadius, outRadius);
-        G.fillRing(width / 2, height / 2, inRadius, r, a, span);
-        G.strokeRing(width / 2, height / 2, inRadius, r, a, span);
-    });
-}</textarea><canvas id="ctx4"></canvas><br>
+<textarea id="ta0" cols="80"></textarea><canvas id="ctx0"></canvas><br>
+<textarea id="ta1" cols="80"></textarea><canvas id="ctx1"></canvas><br>
+<textarea id="ta2" cols="80"></textarea><canvas id="ctx2"></canvas><br>
+<textarea id="ta3" cols="80"></textarea><canvas id="ctx3"></canvas><br>
+<textarea id="ta4" cols="80"></textarea><canvas id="ctx4"></canvas><br>
+<textarea id="ta5" cols="80"></textarea><canvas id="ctx5"></canvas><br>
 
 <script>
 
@@ -217,13 +79,10 @@ function plotPolar(ctx, inRadius, outRadius, data )
     //bornes des valeurs de vitesse du vent
     var ff_min,ff_max;
 
-    //stocke les K-moyens (un peu long à calculer)
-    var Kmeans;
-
     //largeur / hauteur des canvas
     // c'est la même pour tous mais on pourrait en avoir des différentes pour chaque ou récupérer les valeurs des canvas eux mêmes
-    var width = 400;
-    var height = 300;
+    var width = 600;
+    var height = 400;
 
     //on instantie l'utilitaire de dessin sans lui passer de contexte
     var G = new Graphics();
@@ -235,30 +94,30 @@ function plotPolar(ctx, inRadius, outRadius, data )
     //on charge le CSV une fois qu ela page est chargée
     window.onload = function()
     {
-
+        //supprime le canvas créé et ajouté dans base.js
         document.body.removeChild( canvas );
 
-        //on récupère les contextes d'éléments canvas présents dans la page
-        ctx0 = document.getElementById("ctx0").getContext( "2d" );
-        ctx1 = document.getElementById("ctx1").getContext( "2d" );
-        ctx2 = document.getElementById("ctx2").getContext( "2d" );
-        ctx3 = document.getElementById("ctx3").getContext( "2d" );
-        ctx4 = document.getElementById("ctx4").getContext( "2d" );
+        var methods = [ "simpleGraph", "compareHistogram", "plotTime", "plotKmeans", "plotPolar", "plotHull" ];
+        methods.forEach( function( url, id ){
 
-        //liste de références pour nettoyer tout le mponde en boucle
-        ctxs = [ ctx0, ctx1, ctx2, ctx3, ctx4 ];
-
-        //on récupère les textareas présents dans la page
-        ta0 = document.getElementById("ta0");
-        ta1 = document.getElementById("ta1");
-        ta2 = document.getElementById("ta2");
-        ta3 = document.getElementById("ta3");
-        ta4 = document.getElementById("ta4");
-        tas = [ ta0, ta1, ta2, ta3, ta4 ];
-
-        tas.forEach(function( ta ){
-            ta.rows = ta.innerHTML.split( '\n').length;
+            var req = new XMLHttpRequest();
+            req.onload = function(e){
+                var ta = document.getElementById("ta" + id );
+                ta.innerHTML = metrics.trim( e.target.responseText );
+                ta.rows = ta.innerHTML.split( '\n' ).length;
+            };
+            req.open( 'GET', "plotters/"+ url +".js" );
+            req.send(null);
         });
+
+        //PAS BIEN : NE JAMAIS faire ça dans la vraie vie!
+        //on récupère les contextes d'éléments canvas présents dans la page
+        ctxs = [];
+        for( var i = 0; i <= 5; i++ )
+        {
+            window[ "ctx" + i ] = document.getElementById("ctx" + i ).getContext( "2d" );
+            ctxs.push( window[ "ctx" + i ] );
+        }
 
         //on charge le CSV
         loader.load( "synop.2015102115.csv", onCSVReady, ";" );
@@ -278,7 +137,6 @@ function plotPolar(ctx, inRadius, outRadius, data )
         ff_min = bounds[0];
         ff_max = bounds[1];
 
-
         console.log( 'temperatures: t_min', t_min, 't_max', t_max );
         console.log( 'vent: ff_min', ff_min, 'ff_max', ff_max );
 
@@ -291,10 +149,6 @@ function plotPolar(ctx, inRadius, outRadius, data )
     {
         requestAnimationFrame(draw);
 
-        var p0 = new Point(0,0);
-        var p1 = new Point(0,height);
-        var p2 = new Point(width, height );
-
         ctxs.forEach(function(ctx){
 
             ctx.restore();
@@ -306,7 +160,6 @@ function plotPolar(ctx, inRadius, outRadius, data )
             ctx.strokeStyle = "#DDD";
 
         });
-
 
         //on va mapper les valeurs des points entre leurs bornes et le rectangle
         var temperatures = [];
@@ -331,220 +184,34 @@ function plotPolar(ctx, inRadius, outRadius, data )
         });
 
 
+        //1 lignes et points
         simpleGraph( ctx0, temperatures, winds );
 
+
+        //2 histogramme
         compareHistogram( ctx1, temperatures, winds );
 
 
+        //3 sélection d'un point sur une courbe
         //une variable de temps qui oscille
         var t = .5 + Math.sin( Date.now() *.0005 ) * .5;
         plotTime( ctx2, winds, t );
 
 
+        //4 K-moyens (clusters)
         plotKmeans( ctx3, temperatures, winds );
 
 
+        //5 dessine des portions d'anneau
         //rayon intérieur et extérieur du cercle
         var inRadius = height / 4;
         var outRadius = height / 2 * t;
         plotPolar( ctx4, inRadius, outRadius, data );
 
+        //6 convex hull
+        plotHull( ctx5, data );
 
     }
-
-    ////////////////////////////////////////////////////
-
-    // méthodes décrites dans la page
-
-    ////////////////////////////////////////////////////
-
-
-
-
-    //dessine les séries de valeurs sous forme de lignes
-    function simpleGraph( ctx, values0, values1 )
-    {
-        //assigne le contexte à l'utilistaire de dessin
-        G.ctx = ctx;
-
-        //trace le graphe des températures en rouge
-        ctx.strokeStyle = "#F00";
-        G.polyline( values0 );
-
-        //scatterplot des vitesse du vent en bleu
-        ctx.fillStyle = "#09C";
-        values1.forEach( function( p ){G.disc(p, 2);} );
-    }
-
-    //trace la différence entre vent et température
-    function compareHistogram( ctx, values0, values1 ){
-
-        //assigne le contexte à l'utilistaire de dessin
-        G.ctx = ctx;
-
-        values0.forEach(function( v0,i  ){
-
-            //récupère la valeur de values1 à cet index
-            var v1 = values1[ i ];
-
-            //si la valeur 0 est plus grande que la valeur 1
-            var h = v1.y - v0.y;
-            if( h < 0 ) {
-                //dessine un bloc jaune
-                ctx.fillStyle = "#FC0";
-            }else{
-                //sinon dessine un bloc bleu
-                ctx.fillStyle = "#09C";
-            }
-            ctx.fillRect( v0.x, v0.y, width / data.length, h );
-
-        } );
-    }
-
-    //dessine une valeur normalisée T le long d'une série de segments
-    function plotTime(ctx, values, t )
-    {
-        //assigne le contexte à l'utilistaire de dessin
-        G.ctx = ctx;
-
-        //dessine une ligne graduée
-        ctx.fillStyle = ctx.strokeStyle = "#EEE";
-        G.graduation( 0,height, width-1, height, data.length, -20 );
-
-        var id = ( Math.floor( ( values.length - 1 ) * t ) );
-        if( id < 0 ) id = 0;
-
-        //dessine le rectangle où se trouve le point en gris
-        ctx.fillRect( values[ id ].x, 0, width / data.length, height );
-
-        //trace la courbe des températures en noir
-        ctx.strokeStyle = "#666";
-        G.polyline( values );
-
-        //dessine le point au temps T sur la courbe
-        ctx.fillStyle = "#F00";
-        var p = getPositionAt( values, t );
-        G.disc( p, 2 );
-
-        //dessine en bleu les points de la courbe
-        //entre lesquels se trouve le point p
-        ctx.fillStyle = "#09C";
-
-        p = values[ id ];
-        G.disc(p, 2 );
-
-        p = values[ Math.min( id +  1, values.length - 1 ) ];
-        G.disc(p, 2 );
-
-    }
-
-    //dessine les K-moyens
-    function plotKmeans( ctx, values0, values1 ){
-
-        //assigne le contexte à l'utilistaire de dessin
-        G.ctx = ctx;
-
-        //arrière plan en gris foncé
-        ctx.fillStyle = "#333";
-        ctx.fillRect( 0,0,width, height);
-
-        //graphes les valeurs en gris plus clair
-        ctx.strokeStyle = "#666";
-        G.polyline( values0 );
-        G.polyline( values1 );
-
-        //crée une palette de couleurs
-        var colors = [ "#ACE4FF", "#F5EB4E", "#A6F793", "#FF5294" ];
-
-        //concatène les valeurs des 2 tablkeaux
-        var values = values0.concat( values1 );
-
-        //calcule et stocke les K-moyens une fois pour toutes (un peu long à calculer)
-        if( Kmeans == null )
-        {
-            Kmeans = kmeans.compute( values, colors.length, 1000 );
-        }
-
-        var centroids = Kmeans.centroids;
-        var points = Kmeans.points;
-        //dessine les clusters reliés à leur centroids
-        points.forEach(function( p ){
-            ctx.fillStyle = ctx.strokeStyle = colors[ p.centroid ];
-            G.disc(p.x, p.y,2 );
-            G.line( p, centroids[ p.centroid ] )
-        } );
-
-        //dessine les centroids
-        centroids.forEach(function( p, i )
-        {
-            ctx.fillStyle = ctx.strokeStyle = colors[i];
-            G.disc(p.x, p.y, p.items / 2 );
-        } );
-
-    }
-
-    //dessine un graphe polaire des valeurs
-    function plotPolar(ctx, inRadius, outRadius, data )
-    {
-
-        G.ctx = ctx;
-        //dessine un graphe des valeurs polarisées
-        /*
-        var polar = [];
-        ctx.strokeStyle = "#f00";
-        ctx.beginPath();
-        data.forEach( function( obj, i )
-        {
-            var r = map( obj.t, t_min, t_max, rin, rout );
-
-            var a = i / data.length * PI2;
-            var p = new Point( width / 2 + Math.cos( a )*r, height / 2 + Math.sin( a )*r );
-            polar.push( p );
-            ctx.lineTo(p.x, p.y );
-
-        } );
-
-        ctx.closePath();
-        ctx.stroke();
-        //*/
-
-        //dessine des portions d'anneau en gris
-        ctx.strokeStyle = "#ddd";
-        data.forEach( function( obj, i ) {
-            var a = i / data.length * PI2;
-            var span = a + PI2 / data.length;
-            G.strokeRing(width / 2, height / 2, inRadius, outRadius, a, span);
-        });
-
-        //dessine des portions d'anneau en bleu
-        ctx.strokeStyle = ctx.fillStyle = "#09C";
-        data.forEach( function( obj, i ){
-            var a =  i / data.length * PI2;
-            var span = a + PI2 / data.length;
-            var r = map( obj.t, t_min, t_max, inRadius, outRadius );
-            G.fillRing( width/2, height/2, inRadius,r, a, span  );
-            G.strokeRing( width/2, height/2, inRadius,r, a, span  );
-        });
-
-        //dessine des portions d'anneau en jaune
-        ctx.strokeStyle = ctx.fillStyle = "#FC0";
-        data.forEach( function( obj, i ) {
-            var a = i / data.length * PI2;
-            var span = a + PI2 / data.length;
-            var r = map(obj.ff, ff_min, ff_max, inRadius, outRadius);
-            G.fillRing(width / 2, height / 2, inRadius, r, a, span);
-            G.strokeRing(width / 2, height / 2, inRadius, r, a, span);
-        });
-    }
-
-    var mouse = new Point();
-    function onMove(e)
-    {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-    }
-    window.addEventListener('mousemove', onMove, false );
-
 
 </script>
 </body>
