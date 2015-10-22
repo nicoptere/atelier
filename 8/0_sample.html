@@ -18,6 +18,10 @@
             margin: 25px;
             padding: 20px;
         }
+        canvas
+        {
+            box-shadow: 0px 4px 6px 1px #999;
+        }
 
     </style>
 </head>
@@ -119,8 +123,12 @@ function plotKmeans( ctx, values0, values1 ){
     //assigne le contexte à l'utilistaire de dessin
     G.ctx = ctx;
 
-    //graphes les valeurs en gris clair
-    ctx.strokeStyle = "#CCC";
+    //arrière plan en gris foncé
+    ctx.fillStyle = "#333";
+    ctx.fillRect( 0,0,width, height);
+
+    //graphes les valeurs en gris plus clair
+    ctx.strokeStyle = "#666";
     G.polyline( values0 );
     G.polyline( values1 );
 
@@ -131,6 +139,7 @@ function plotKmeans( ctx, values0, values1 ){
     var values = values0.concat( values1 );
 
     //calcule et stocke les K-moyens une fois pour toutes
+    //(un peu long à calculer)
     if( Kmeans == null )
     {
         Kmeans = kmeans.compute( values, colors.length, 1000 );
@@ -435,8 +444,12 @@ function plotPolar(ctx, inRadius, outRadius, data )
         //assigne le contexte à l'utilistaire de dessin
         G.ctx = ctx;
 
-        //graphes les valeurs en gris clair
-        ctx.strokeStyle = "#CCC";
+        //arrière plan en gris foncé
+        ctx.fillStyle = "#333";
+        ctx.fillRect( 0,0,width, height);
+
+        //graphes les valeurs en gris plus clair
+        ctx.strokeStyle = "#666";
         G.polyline( values0 );
         G.polyline( values1 );
 
