@@ -29,6 +29,11 @@
 <script src="utils/simplify.js"></script>
 <script src="utils/quadratic.js"></script>
 <script src="utils/kmeans.js"></script>
+<script src="utils/convexhull.js"></script>
+<script src="utils/circle.js"></script>
+<script src="utils/metrics.js"></script>
+
+
 
 <canvas id="ctx0"></canvas>
 <canvas id="ctx1"></canvas>
@@ -191,7 +196,7 @@
         {
 
             //espacement régulier en X
-            x = map( i, 0, data.length, marginX, width - marginX );
+            x = map( i, 0, data.length, marginX, width - marginX ) + ( width / data.length ) * .5;
 
             //mappe la valeur T de l'objet en cours entre t_min / t_max
             y = map( obj.t, t_min, t_max, height - marginY, marginY );
@@ -244,7 +249,7 @@
 
 
 
-        var Kmeans = kmeans.compute( winds.concat( temperatures ), 10 );
+        var Kmeans = kmeans.compute( winds.concat( temperatures ), Math.sqrt( data.length / 2 ), 1 );
         var centroids = Kmeans.centroids;
 
         G.ctx = ctx3;
@@ -262,13 +267,10 @@
 
         ctx4.setTransform(1,0,0,1,0, 0);
         ctx4.clearRect(0,0,ctx4.canvas.width, ctx4.canvas.height);
-        var rin = 50;
+        var rin = 25 + t * 75;
         var rout = 150;
 
         ctx4.strokeStyle = "#DDD";
-    //        ctx4.lineWidth = 2;
-    //        G.circle( width/2, height/2, lerp(.5, rin, rout ) );
-        ctx4.lineWidth = 1;
         G.circle( width/2, height/2, rin );
         G.circle( width/2, height/2, rout );
 
@@ -284,18 +286,57 @@
             ctx4.lineTo(p.x, p.y );
 
         } );
+
         ctx4.closePath();
-        ctx4.stroke();
+//        ctx4.stroke();
+//        return;
+//
+//        var simple = simplify.compute( polar, 50 );
+//
+//        ctx4.strokeStyle = "#FC0";
+//        G.polyline(  simple );
+//
+//
+        ctx4.fillStyle = "#09C";
+//        G.polyline( convexhull.compute( polar ), true );
+//
+//        var c = new Circle().minimumEnclosingCircle( polar );
+//        G.circle( c, c.r );
 
+        data.forEach( function( obj, i ) {
+            var a = i / data.length * PI2;
+            var span = a + PI2 / data.length;
 
-        ctx4.strokeStyle = "#09C";
-        G.polyline( CatmullRom.compute( polar,.1, true ) );
+            ctx4.strokeStyle = "#ddd";
+            G.strokeRing(width / 2, height / 2, rin, rout, a, span);
+        });
 
+        ctx4.strokeStyle = ctx4.fillStyle = "#09C";
+        data.forEach( function( obj, i )
+        {
+            var a =  i / data.length * PI2;
+            var span = a + PI2 / data.length;
+            var r = map( obj.t, t_min, t_max, rin, rout );
+            G.fillRing( width/2, height/2, rin,r, a, span  );
+            G.strokeRing( width/2, height/2, rin,r, a, span  );
 
-        ctx4.strokeStyle = "#FC0";
-        G.polyline( simplify.compute( quadratic.compute( polar,.1, true ), 40 ) );
+        });
 
+        ctx4.strokeStyle = ctx4.fillStyle = "#FC0";
+        data.forEach( function( obj, i ) {
 
+            var a = i / data.length * PI2;
+            var span = a + PI2 / data.length;
+            var r = map(obj.ff, ff_min, ff_max, rin, rout);
+            G.fillRing(width / 2, height / 2, rin, r, a, span);
+            G.strokeRing(width / 2, height / 2, rin, r, a, span);
+
+        });
+
+//        G.fillRing( width/2, height/2, 50,150, PI / 3, -PI / 4 );
+//        ctx4.strokeStyle = "#FC0";
+
+//        setTimeout( draw, 1 )
     }
 
     var mouse = new Point();

@@ -37,3 +37,7 @@ Point.prototype =
 
 Point.add = function( a, b ){return new Point( a.x + b.x, a.y + b.y );};
 Point.sub = function( a, b ){return new Point( a.x - b.x, a.y - b.y );};
+Point.fromAngleDistance = function( angle, distance ){
+    return new Point( Math.cos( angle ) * distance, Math.sin( angle ) * distance );
+}
+

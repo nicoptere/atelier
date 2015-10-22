@@ -637,8 +637,9 @@ Polygon.prototype =
 		var mean = 0;
 		values.forEach( function( e, i, a )
 		{
-			mean += e.value / values.length;
+			mean += e.value;
 		} );
+        mean /= values.length;
 		return mean;
 	},
 
@@ -647,7 +648,7 @@ Polygon.prototype =
 		var result = 0;
 
 		var mean_value = this.mean( values );
-		var count = values.length - 1;
+		var count = values.length;
 
 		values.forEach( function( e, i, a )
 		{

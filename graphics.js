@@ -100,6 +100,57 @@ var Graphics = function( ctx )
         exports.ctx.fill();
     };
 
+    exports.strokeRing = function( x,y, radiusIn, radiusOut, angle, length )
+    {
+        //permet de passer un point au lieu de x, y
+        if(x.x != null )return exports.strokeRing(x.x, x.y, y, radiusIn, radiusOut, angle );
+
+        angle = angle || 0;
+        length = length || Math.PI * 2;
+
+        var ia = Math.min( angle, length );
+        var oa = Math.max( angle, length );
+
+        var center = new Point(x,y);
+        var i0 = Point.fromAngleDistance( ia, radiusIn ).add( center );
+        //var i1 = Point.fromAngleDistance( oa, radiusIn ).add( center );
+        var o1 = Point.fromAngleDistance( oa, radiusOut ).add( center );
+        //var o0 = Point.fromAngleDistance( ia, radiusOut ).add( center );
+
+        exports.ctx.beginPath();
+        exports.ctx.arc( x, y, radiusIn, ia, oa, false );
+        exports.ctx.lineTo( o1.x, o1.y );
+        exports.ctx.arc( x, y, radiusOut, oa, ia, true );
+        exports.ctx.lineTo( i0.x, i0.y );
+        exports.ctx.stroke();
+
+    };
+
+    exports.fillRing = function( x,y, radiusIn, radiusOut, angle, length )
+    {
+        //permet de passer un point au lieu de x, y
+        if(x.x != null )return exports.fillRing(x.x, x.y, y, radiusIn, radiusOut, angle );
+
+        angle = angle || 0;
+        length = length || Math.PI * 2;
+
+        var ia = Math.min( angle, length );
+        var oa = Math.max( angle, length );
+
+        var center = new Point(x,y);
+        var i0 = Point.fromAngleDistance( ia, radiusIn ).add( center );
+        //var i1 = Point.fromAngleDistance( oa, radiusIn ).add( center );
+        var o1 = Point.fromAngleDistance( oa, radiusOut ).add( center );
+        //var o0 = Point.fromAngleDistance( ia, radiusOut ).add( center );
+
+        exports.ctx.beginPath();
+        exports.ctx.arc( x, y, radiusIn, ia, oa, false );
+        exports.ctx.lineTo( o1.x, o1.y );
+        exports.ctx.arc( x, y, radiusOut, oa, ia, true );
+        exports.ctx.lineTo( i0.x, i0.y );
+        exports.ctx.fill();
+
+    };
     exports.quadCurve = function( a,b,c )
     {
         exports.ctx.beginPath();
@@ -115,6 +166,7 @@ var Graphics = function( ctx )
         exports.ctx.bezierCurveTo(b.x, b.y, c.x, c.y, d.x, d.y );
         exports.ctx.stroke();
     };
+
 
 
 

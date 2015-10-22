@@ -21,7 +21,7 @@ var loader = function( exports ){
 
             .map( function( str )
             {
-                return  str.split( ";" )
+                return  str.split( exports.separator )
                     //caste les valeurs numériques en chiffres
                     .map( function( s )
                     {
@@ -61,9 +61,11 @@ var loader = function( exports ){
     };
 
 
-    exports.load = function( url, callback )
+    exports.load = function( url, callback, separator )
     {
         exports.callback = callback;
+        exports.separator = separator || ";";
+
         req.open( "GET",  url );
         req.send();
 
