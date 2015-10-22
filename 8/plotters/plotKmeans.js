@@ -6,7 +6,7 @@ function plotKmeans( ctx, values0, values1 ){
     //assigne le contexte à l'utilitaire de dessin
     G.ctx = ctx;
 
-    //arrière plan en gris foncé
+    //arrière plan en violet foncé
     ctx.fillStyle = "#260A30";
     ctx.fillRect( 0,0,width, height);
 
