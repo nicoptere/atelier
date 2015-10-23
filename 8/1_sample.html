@@ -34,8 +34,13 @@
 <script src="CSVLoader.js"></script>
 
 <!--utilitaires géométriques-->
+<!--<script src="utils/cardinal.js"></script>-->
+<!--<script src="utils/catmullrom.js"></script>-->
+<!--<script src="utils/simplify.js"></script>-->
+<!--<script src="utils/quadratic.js"></script>-->
 <script src="utils/kmeans.js"></script>
 <script src="utils/convexhull.js"></script>
+<!--<script src="utils/circle.js"></script>-->
 <script src="utils/metrics.js"></script>
 
 <!-- methodes de dessin -->
@@ -58,7 +63,7 @@
 <script>
 
     /*
-    le CSV provient de:
+     le CSV provient de:
      https://donneespubliques.meteofrance.fr/?fond=produit&id_produit=90&id_rubrique=32
      c'est un relevé météo sur 51 stations en france métropolitaine
 
@@ -92,31 +97,30 @@
         //supprime le canvas créé et ajouté dans base.js
         document.body.removeChild( canvas );
 
-        var methods = [ "plotSimpleGraph", "plotCompareHistogram", "plotTime", "plotKmeans", "plotPolar", "plotHull" ];
-        methods.forEach( function( url, id ){
-
-            var req = new XMLHttpRequest();
-            req.onload = function(e){
-                var ta = document.getElementById("ta" + id );
-                ta.innerHTML = metrics.trim( e.target.responseText );
-                ta.rows = ta.innerHTML.split( '\n' ).length;
-            };
-            req.open( 'GET', "plotters/"+ url +".js" );
-            req.send(null);
-        });
-
-        //PAS BIEN : NE JAMAIS faire ça dans la vraie vie!
-        //on récupère les contextes d'éléments canvas présents dans la page
-        ctxs = [];
-        for( var i = 0; i <= 5; i++ )
-        {
-            window[ "ctx" + i ] = document.getElementById("ctx" + i ).getContext( "2d" );
-            ctxs.push( window[ "ctx" + i ] );
-        }
+//        var methods = [ "plotSimpleGraph", "plotCompareHistogram", "plotTime", "plotKmeans", "plotPolar", "plotHull" ];
+//        methods.forEach( function( url, id ){
+//
+//            var req = new XMLHttpRequest();
+//            req.onload = function(e){
+//                var ta = document.getElementById("ta" + id );
+//                ta.innerHTML = metrics.trim( e.target.responseText );
+//                ta.rows = ta.innerHTML.split( '\n' ).length;
+//            };
+//            req.open( 'GET', "plotters/"+ url +".js" );
+//            req.send(null);
+//        });
+//
+//        //PAS BIEN : NE JAMAIS faire ça dans la vraie vie!
+//        //on récupère les contextes d'éléments canvas présents dans la page
+//        ctxs = [];
+//        for( var i = 0; i <= 5; i++ )
+//        {
+//            window[ "ctx" + i ] = document.getElementById("ctx" + i ).getContext( "2d" );
+//            ctxs.push( window[ "ctx" + i ] );
+//        }
 
         //on charge le CSV
-        var loader = new CSVLoader();
-        loader.load( "synop.2015102115.csv", onCSVReady, ";" );
+        loader.load( "lorem_ipsum.txt", onCSVReady, " " );
     };
 
 
@@ -124,7 +128,8 @@
     {
 
         data = result;
-
+        console.table( result );
+return;
         var bounds = metrics.getBounds( data, 't' );
         t_min = bounds[0];
         t_max = bounds[1];
