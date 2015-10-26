@@ -12,17 +12,17 @@ function plotQuadraticCompare( ctx, data, values0, values1 )
     //tableaux temporaires pour stocker les valeurs sous forme d'objets
     var ts = [], ffs = [];
     data.forEach( function(item, i ){
-        ts.push( { id : i, val : item.t,      x: left + 10, y: 40 + i * 7 } );
-        ffs.push( { id : i, val : item.ff,    x:right - 10, y: 40 + i * 7 } );
+        ts.push( { id : i, val : item.t,      x: left + 10 } );
+        ffs.push( { id : i, val : item.ff,    x:right - 10 } );
     });
 
     //classe et dessine les temperatures par ordre croissant
     ts.sort( function(a,b){ return a.val - b.val });
-    ts.forEach(function(o, i) { G.text(o.val, 5, o.x, o.y  ); });
+    ts.forEach(function(o, i) { G.text(o.val, 5, o.x, 40 + i * 7  ); });
 
     //classe et dessine les vitesses du vent  par ordre croissant
     ffs.sort( function(a,b){ return a.val - b.val });
-    ffs.forEach(function(o, i){ G.text(o.val, 5, o.x, o.y ); });
+    ffs.forEach(function(o, i){ G.text(o.val, 5, o.x, 40 + i * 7 ); });
 
     //crée 4 variables pour dessiner les courbes (points de controle)
     var a = new Point(), b = new Point(), c = new Point(), d = new Point();
@@ -30,12 +30,12 @@ function plotQuadraticCompare( ctx, data, values0, values1 )
 
         a.x = o.x + 25;
         b.x = o.x + 25 + width / 2;
-        a.y = b.y = o.y;
+        a.y = b.y = 40 + i * 7;
 
-        var ff = ffs[ o.id ];
+        var ff = ffs[o.id ];
         c.x = ff.x - 3 - width / 2;
         d.x = ff.x - 3;
-        c.y = d.y = ff.y;
+        c.y = d.y = 40 + o.id * 7;
 
         //dessine en rouge ou en bleu si la température arrive avant ou
         //après le vent dans la liste réorganisée (on compare les Y, pas VAL )
