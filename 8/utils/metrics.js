@@ -70,8 +70,6 @@ var metrics = function(exports)
         return string.replace(/[^\w\s]/gi, '');
     };
 
-
-
     return exports;
 
 }({});

@@ -31,16 +31,16 @@
 <script src="../base.js"></script>
 <script src="../geom.js"></script>
 <script src="../graphics.js"></script>
-<script src="CSVLoader.js"></script>
+<script src="TXTLoader.js"></script>
 
 <!--utilitaires géométriques-->
-<!--<script src="utils/cardinal.js"></script>-->
-<!--<script src="utils/catmullrom.js"></script>-->
-<!--<script src="utils/simplify.js"></script>-->
-<!--<script src="utils/quadratic.js"></script>-->
+<script src="utils/cardinal.js"></script>
+<script src="utils/catmullrom.js"></script>
+<script src="utils/simplify.js"></script>
+<script src="utils/quadratic.js"></script>
 <script src="utils/kmeans.js"></script>
 <script src="utils/convexhull.js"></script>
-<!--<script src="utils/circle.js"></script>-->
+<script src="utils/circle.js"></script>
 <script src="utils/metrics.js"></script>
 
 <!-- methodes de dessin -->
@@ -53,22 +53,22 @@
 
 
 
-<textarea id="ta0" cols="80"></textarea><canvas id="ctx0"></canvas><br>
-<textarea id="ta1" cols="80"></textarea><canvas id="ctx1"></canvas><br>
-<textarea id="ta2" cols="80"></textarea><canvas id="ctx2"></canvas><br>
-<textarea id="ta3" cols="80"></textarea><canvas id="ctx3"></canvas><br>
-<textarea id="ta4" cols="80"></textarea><canvas id="ctx4"></canvas><br>
-<textarea id="ta5" cols="80"></textarea><canvas id="ctx5"></canvas><br>
+<!--<textarea id="ta0" cols="80"></textarea><canvas id="ctx0"></canvas><br>-->
+<!--<textarea id="ta1" cols="80"></textarea><canvas id="ctx1"></canvas><br>-->
+<!--<textarea id="ta2" cols="80"></textarea><canvas id="ctx2"></canvas><br>-->
+<!--<textarea id="ta3" cols="80"></textarea><canvas id="ctx3"></canvas><br>-->
+<!--<textarea id="ta4" cols="80"></textarea><canvas id="ctx4"></canvas><br>-->
+<!--<textarea id="ta5" cols="80"></textarea><canvas id="ctx5"></canvas><br>-->
+
+:[a-z]+|\.<[a-z]+>
+http://glslb.in/s/1ffbe7d4
+
 
 <script>
 
     /*
-     le CSV provient de:
-     https://donneespubliques.meteofrance.fr/?fond=produit&id_produit=90&id_rubrique=32
-     c'est un relevé météo sur 51 stations en france métropolitaine
-
-     le détail du format se trouve dans le pdf doc_parametres_synop_168.pdf
-     */
+    charge un texte
+    */
 
     //on stockera nos données dans data
     var data = [];
@@ -91,11 +91,11 @@
     var ctx0, ctx1, ctx2, ctx3, ctx4, ctxs;
 
 
-    //on charge le CSV une fois qu ela page est chargée
+    //on charge le TXT une fois qu ela page est chargée
     window.onload = function()
     {
         //supprime le canvas créé et ajouté dans base.js
-        document.body.removeChild( canvas );
+//        document.body.removeChild( canvas );
 
 //        var methods = [ "plotSimpleGraph", "plotCompareHistogram", "plotTime", "plotKmeans", "plotPolar", "plotHull" ];
 //        methods.forEach( function( url, id ){
@@ -119,17 +119,19 @@
 //            ctxs.push( window[ "ctx" + i ] );
 //        }
 
-        //on charge le CSV
-        loader.load( "lorem_ipsum.txt", onCSVReady, " " );
+
+        //on charge le TXT
+        var loader = new TXTLoader();
+        loader.load( "lorem_ipsum.txt", onTXTReady, /\s/gi );
     };
 
 
-    function onCSVReady( result )
+    function onTXTReady( result )
     {
 
         data = result;
         console.table( result );
-return;
+
         var bounds = metrics.getBounds( data, 't' );
         t_min = bounds[0];
         t_max = bounds[1];

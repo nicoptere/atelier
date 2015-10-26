@@ -29,7 +29,6 @@ var CSVLoader = function(){
                         //caste les valeurs numériques en chiffres
                         .map( function( s )
                         {
-                            var value = s;
                             if( !isNaN( parseFloat( s ) ) )return parseFloat( s );
                             return s;
                         });
