@@ -13,17 +13,7 @@
             padding:0;
             overflow: hidden;
         }
-        /*canvas, textarea*/
-        /*{*/
-            /*vertical-align: middle;*/
-            /*margin: 25px;*/
-            /*padding: 20px;*/
-        /*}*/
-        /*canvas*/
-        /*{*/
-            /*box-shadow: 0px 4px 6px 1px #999;*/
-        /*}*/
-
+        
     </style>
 </head>
 <body>
@@ -49,9 +39,7 @@
 
 <script>
 
-    var data = [];
     var G = new Graphics( ctx );
-
     window.onload = function(){
 
         var loader = new TXTLoader();
@@ -59,11 +47,15 @@
     };
 
 
+
+    var data = [];
     function onTXTReady( result ){
 
         data = result;
         draw();
     }
+
+
 
 
     function draw()
@@ -92,7 +84,6 @@
         var alphabet = "abcdefghijklmnopqrstuvwxyz";
 
         var step = PI2 / alphabet.length;
-
         for( var i = 0; i< alphabet.length; i++ )
         {
             var angle = i*step;
@@ -108,7 +99,6 @@
 
         var colors = ["#B27686", "#E16C63", "#FD7A40", "#F3A137", "#F6CD3F" ];
 
-
         data.forEach(function(data, index)
         {
 
@@ -123,7 +113,7 @@
                 letters.forEach(function( letter )
                 {
                     var id = alphabet.lastIndexOf( letter );
-                        letterCount[id]++;
+                    letterCount[id]++;
 
                 });
             });
@@ -158,7 +148,7 @@
 
     }
     var dir = 0;
-    var sy = 0;
+    var sy = 1;
     var angleStart = 0;
     canvas.addEventListener( "mousemove", function(e){
         dir = (e.clientX - w/2 ) / w;

@@ -13,157 +13,159 @@
             padding:0;
             overflow: hidden;
         }
-        /*canvas, textarea*/
-        /*{*/
-            /*vertical-align: middle;*/
-            /*margin: 25px;*/
-            /*padding: 20px;*/
-        /*}*/
-        /*canvas*/
-        /*{*/
-            /*box-shadow: 0px 4px 6px 1px #999;*/
-        /*}*/
 
     </style>
 </head>
 <body>
 
 
-<script src="../base.js"></script>
+<!--<script src="../base.js"></script>-->
 <script src="../geom.js"></script>
 <script src="../graphics.js"></script>
 <script src="TXTLoader.js"></script>
 
 <!--utilitaires géométriques-->
-<script src="utils/cardinal.js"></script>
-<script src="utils/catmullrom.js"></script>
-<script src="utils/simplify.js"></script>
-<script src="utils/quadratic.js"></script>
-<script src="utils/kmeans.js"></script>
-<script src="utils/convexhull.js"></script>
-<script src="utils/circle.js"></script>
-<script src="utils/metrics.js"></script>
-
+<script src="light-map/light-map.js"></script>
 
 
 
 <script>
 
     var data = [];
-    var G = new Graphics( ctx );
+    var w = window.innerWidth;
+    var h = window.innerHeight;
 
-    window.onload = function(){
+//    var provider = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+//    var domains = ["a","b","c"];
 
-        var loader = new TXTLoader();
-        loader.load( "lorem_ipsum.txt", onTXTReady, /\s/gi );
-    };
+    var provider = 'http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg';
+    var domains = '1234'.split('');
+    var map = new Map( provider, domains, w,h, 1, 19 );
 
 
-    function onTXTReady( result ){
+    var lat =  48.8534100;
+    var lon =  2.348800;
+    map.setView( lat, lon, 16 );
 
-        data = result;
-        draw();
-    }
 
+    document.body.appendChild( map.canvas );
+    var G = new Graphics( map.ctx );
+    var ctx = map.ctx;
 
     function draw()
     {
         requestAnimationFrame(draw);
 
-        ctx.restore();
-        ctx.clearRect( 0,0,w,h );
-
-        var cx = w / 2;
-        var cy = h / 2;
-
-        ctx.save();
-        ctx.translate(cx,cy);
-
-        ctx.save();
-        ctx.scale( 1, 1 / ( sy ) );
-        var radiusMin = 100;
-        var radiusMax = 200;
-
-        ctx.strokeStyle = "#CCC";
-        G.circle( 0,0, radiusMin );
-        G.circle( 0,0, radiusMin + radiusMax );
+        w = window.innerWidth;
+        h = window.innerHeight;
+        map.width = w;
+        map.height = h;
+        map.setView();//redessine
+        // ou :
+        //map.renderTiles(); // si pas de changement de vue
 
 
-        var alphabet = "abcdefghijklmnopqrstuvwxyz";
-
-        var step = PI2 / alphabet.length;
-
-        for( var i = 0; i< alphabet.length; i++ )
-        {
-            var angle = i*step;
-
-            G.line( Point.fromAngleDistance( angleStart + angle, radiusMin),
-                    Point.fromAngleDistance( angleStart + angle, radiusMin + radiusMax ) );
-
-            var pt = Point.fromAngleDistance( angleStart + angle, radiusMin + radiusMax + 30 );
-            G.text( alphabet.charAt( i ), "16", pt.x, pt.y );
-
-        }
-
-
-        var colors = ["#B27686", "#E16C63", "#FD7A40", "#F3A137", "#F6CD3F" ];
-
-
-        data.forEach(function(data, index)
+        pos.forEach( function( p )
         {
 
-            var sentence = data;
-
-            var letterCount = [];
-            for( var i = 0; i< alphabet.length; i++ )letterCount[i]=0;
-
-            sentence.forEach(function( word )
-            {
-                var letters = word.toLowerCase().split( "" );
-                letters.forEach(function( letter )
-                {
-                    var id = alphabet.lastIndexOf( letter );
-                        letterCount[id]++;
-
-                });
-            });
-
-            var max = letterCount.reduce(function( a,b ){ return Math.max( a,b );} );
-
-            for( i = 0; i< alphabet.length; i++ )
-            {
-
-                ctx.strokeStyle = ctx.fillStyle = colors[ index % colors.length ];
-
-                var radius = map( letterCount[i], 0, max, radiusMin, radiusMin + radiusMax );
-                var current = Point.fromAngleDistance( angleStart + i * step, radius );
-                current.y -= ( max - letterCount[ i ] ) * ( sy - 1 )  * 2;
-                G.disc( current, 2 );
-
-                var previousId = ( i-1 ) < 0 ? alphabet.length - 1 : ( i-1 );
-                var prevRadius = map( letterCount[ previousId ], 0, max, radiusMin, radiusMin + radiusMax );
-                var previous = Point.fromAngleDistance( angleStart + previousId * step, prevRadius );
-                previous.y -= ( max - letterCount[ previousId ] ) * ( sy - 1 )  * 2;
-                G.line( current, previous );
-
-                ctx.strokeStyle = ctx.fillStyle = "#CCC";
-                var ground = Point.fromAngleDistance( angleStart + i * step, radius );
-                G.line( current, ground );
-
-            }
+            var xy = latLonToPixels( p[0], p[1] );
+            G.disc( xy[0], xy[1], Math.max( 1, ( map.zoom - p[2] ) ) * 10 )
 
         });
-        ctx.restore();
-        angleStart += RAD * dir;
 
     }
-    var dir = 0;
-    var sy = 0;
-    var angleStart = 0;
-    canvas.addEventListener( "mousemove", function(e){
-        dir = (e.clientX - w/2 ) / w;
-        sy = 1 + ( e.clientY / h ) * 6;
-    });
+
+    var pos = [];
+    var origin = new Point();
+    var dest = new Point();
+    var mouseDown = false;
+
+    function onDown(e){
+
+        var x = e.clientX;
+        var y = e.clientY;
+        origin.x = x;
+        origin.y = y;
+        mouseDown = true;
+
+        var op = pixelsToLatLon( x, y );
+        op.push( map.zoom );
+        pos.push( op );
+
+    }
+    map.canvas.addEventListener( "mousedown", onDown, false );
+
+    function onUp(e){
+        mouseDown = false;
+    }
+    map.canvas.addEventListener( "mouseup", onUp, false );
+
+    function onMove(e){
+
+        if( mouseDown )
+        {
+            var x = e.clientX;
+            var y = e.clientY;
+
+            dest.x = x;
+            dest.y = y;
+
+            var op = pixelsToLatLon( origin.x, origin.y );
+            var dp = pixelsToLatLon( dest.x, dest.y );
+
+            var lat = map.latitude + ( op[0] - dp[0] );
+            var lon = map.longitude + ( op[1] - dp[1] );
+
+            map.setView( lat, lon );
+
+            origin.x = x;
+            origin.y = y;
+
+        }
+    }
+    map.canvas.addEventListener( "mousemove", onMove, false );
+
+    function zoom(e)
+    {
+
+        var x = e.clientX;
+        var y = e.clientY;
+
+        var op = pixelsToLatLon( x, y );
+
+        map.zoom += e.wheelDelta > 0 ? 1 : -1;
+
+        var dp = pixelsToLatLon( x, y );
+
+        var lat = map.latitude + ( op[0] - dp[0] );
+        var lon = map.longitude + ( op[1] - dp[1] );
+
+        map.setView( lat, lon );
+
+    }
+    map.canvas.addEventListener( "mousewheel", zoom, false );
+
+    function pixelsToLatLon( x,y, zoom )
+    {
+
+        var c = map.mercator.latLngToPixels( -map.latitude, map.longitude, zoom || map.zoom  );
+        var pos = map.mercator.pixelsToLatLng( c[ 0 ] - map.width / 2 + x, c[ 1 ] - map.height / 2 + y, zoom || map.zoom );
+        pos[0] *= -1;
+        return pos;
+
+    }
+
+    function latLonToPixels( lat,lon, zoom )
+    {
+
+        var c = map.mercator.latLngToPixels( -map.latitude, map.longitude, zoom || map.zoom  );
+        var p = map.mercator.latLngToPixels( -lat, lon, zoom || map.zoom  );
+        return [ (p[0]-c[0]) + map.width / 2, ( p[1] - c[1] ) + map.height / 2 ];
+
+    }
+
+    draw();
+
 </script>
 </body>
 </html>
