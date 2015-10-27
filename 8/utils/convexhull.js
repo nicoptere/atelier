@@ -15,8 +15,10 @@ var convexhull = function(exports)
                 var bestAngle = Math.pow( 2, 53 );
                 var bestIndex = 0;
                 for ( var i = 0; i < points.length; i++ ){
+
                     var testPoint = points[i];
                     if (testPoint == point)continue;
+
                     var dx = testPoint.x - point.x;
                     var dy = testPoint.y - point.y;
                     var testAngle = Math.atan2(dy,dx) - angle;

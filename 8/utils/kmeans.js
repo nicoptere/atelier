@@ -11,7 +11,7 @@ var kmeans = function(exports)
         iterations = iterations || 5;
 
         var l = points.length;
-        k = k || Math.sqrt( l ) * 2;//Math.sqrt( l * 10 );
+        k = k || Math.sqrt( l/2 );
 
 
         /** K-Means++ initialization */
