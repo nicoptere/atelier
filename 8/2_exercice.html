@@ -31,7 +31,7 @@
 
 <script>
 
-    var data = [];
+
     var w = window.innerWidth;
     var h = window.innerHeight;
 
@@ -70,23 +70,28 @@
         }
 
         ctx.globalAlpha = .35;
+
         ctx.fillStyle = "#000";
         G.polygon(border, true );
         ctx.globalAlpha = 1;
 
 
-        pos.filter( function(p){return p.zoom == map.zoom; } ).forEach( function( p )
+        groups.forEach( function( pos, i )
         {
-            ctx.fillStyle = ctx.strokeStyle = colors[ map.zoom % colors.length ];
-            var xy = map.latLonToPixels( p.x, p.y );
-            G.disc( xy[0], xy[1], Math.max( 1, ( map.zoom - p.zoom ) ) * 5 );
-        });
+            ctx.fillStyle = ctx.strokeStyle = colors[ i % colors.length ];
 
-        var hull = convexhull.compute( pos.filter( function(p){return p.zoom == map.zoom; } ) ).map( lonLatToPixels );
-        ctx.globalAlpha = .65;
-        G.polygon( CatmullRom.compute( hull, .1, true ), true );
-        ctx.globalAlpha = 1;
+            pos.forEach( function( p )
+            {
+                var xy = map.latLonToPixels( p.x, p.y );
+                G.disc( xy[0], xy[1], Math.max( 1, ( map.zoom - p.zoom ) ) * 5 );
+            });
 
+            var hull = convexhull.compute( pos ).map( lonLatToPixels );
+            ctx.globalCompositeOperation = "hard-light";
+            G.polygon( CatmullRom.compute( hull, .1, true ), true );
+            ctx.globalCompositeOperation = "source-over";
+
+        })
     }
 
     function lonLatToPixels(p){
@@ -94,10 +99,13 @@
         return new Point( xy[0], xy[1] );
     }
 
+    var groups = [];
     var pos = [];
+
     var origin = new Point();
     var dest = new Point();
     var mouseDown = false;
+    var ctrlDown = false;
 
     function onDown(e){
 
@@ -105,15 +113,28 @@
         origin.y = e.clientY;
         mouseDown = true;
 
-        var cp = map.pixelsToLatLon( e.clientX, e.clientY );
-        var p = new Point( cp[0], cp[1] );
-        p.zoom = map.zoom;
-        pos.push( p );
+        if(  ctrlDown )
+        {
 
+            var cp = map.pixelsToLatLon( e.clientX, e.clientY );
+            var p = new Point( cp[0], cp[1] );
+            p.zoom = map.zoom;
+            pos.push( p );
+
+            if( groups.indexOf(pos)==-1)groups.push( pos );
+        }
     }
 
     function onUp(e){
         mouseDown = false;
+    }
+
+    function onKeyHandler(e){
+        ctrlDown = e.ctrlKey;
+        if( ctrlDown == false )
+        {
+            if( pos.length != 0 )pos = [];
+        }
     }
 
     function onMove(e){
@@ -173,6 +194,9 @@
     map.canvas.addEventListener( "mouseleave", onUp, false );
     map.canvas.addEventListener( "mousewheel", zoom, false );
     map.canvas.addEventListener( "mousemove", onMove, false );
+
+    window.addEventListener( "keydown", onKeyHandler, false );
+    window.addEventListener( "keyup", onKeyHandler, false );
 
 
 
