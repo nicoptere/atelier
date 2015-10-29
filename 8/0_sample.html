@@ -46,6 +46,7 @@
 <script src="plotters/plotPolar.js"></script>
 <script src="plotters/plotHull.js"></script>
 <script src="plotters/plotQuadraticCompare.js"></script>
+<script src="plotters/plotArcs.js"></script>
 
 
 
@@ -56,6 +57,7 @@
 <textarea id="ta4" cols="80"></textarea><canvas id="ctx4"></canvas><br>
 <textarea id="ta5" cols="80"></textarea><canvas id="ctx5"></canvas><br>
 <textarea id="ta6" cols="80"></textarea><canvas id="ctx6"></canvas><br>
+<textarea id="ta7" cols="80"></textarea><canvas id="ctx7"></canvas><br>
 
 <script>
 
@@ -85,7 +87,7 @@
     var G = new Graphics();
 
     //on maintient une liste de références vers X contextes
-    var ctx0, ctx1, ctx2, ctx3, ctx4, ctx5, ctx6, ctxs;
+    var ctx0, ctx1, ctx2, ctx3, ctx4, ctx5, ctx6, ctx7, ctxs;
 
 
     //on charge le CSV une fois qu ela page est chargée
@@ -94,7 +96,7 @@
         //supprime le canvas créé et ajouté dans base.js
         document.body.removeChild( canvas );
 
-        var methods = [ "plotSimpleGraph", "plotCompareHistogram", "plotTime", "plotKmeans", "plotPolar", "plotHull", "plotQuadraticCompare" ];
+        var methods = [ "plotSimpleGraph", "plotCompareHistogram", "plotTime", "plotKmeans", "plotPolar", "plotHull", "plotQuadraticCompare", "plotArcs" ];
         methods.forEach( function( url, id ){
 
             var req = new XMLHttpRequest();
@@ -110,7 +112,7 @@
         //PAS BIEN : NE JAMAIS faire ça dans la vraie vie!
         //on récupère les contextes d'éléments canvas présents dans la page
         ctxs = [];
-        for( var i = 0; i <= 6; i++ )
+        for( var i = 0; i < methods.length; i++ )
         {
             window[ "ctx" + i ] = document.getElementById("ctx" + i ).getContext( "2d" );
             ctxs.push( window[ "ctx" + i ] );
@@ -211,6 +213,10 @@
 
         //6 deux listes reliées
         plotQuadraticCompare( ctx6, data );
+
+
+        //7 deux séries d'arcs
+        plotArcs( ctx7, data );
     }
 
 </script>

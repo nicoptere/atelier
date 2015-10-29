@@ -1,35 +1,25 @@
 //dessine un graphe polaire des valeurs
-function plotPolar(ctx, inRadius, outRadius, data )
+function plotArcs(ctx, data )
 {
-
     //assigne le contexte à l'utilitaire de dessin
     G.ctx = ctx;
+    ctx.lineWidth = .25;
 
-    //dessine des portions d'anneau en gris
-    ctx.strokeStyle = "#ddd";
-    data.forEach( function( obj, i ) {
-        var a = i / data.length * PI2;
-        var span = a + PI2 / data.length;
-        G.strokeRing(width / 2, height / 2, inRadius, outRadius, a, span);
+    var Y = height / 3 * 2;
+    data.forEach( function( obj, i )
+    {
+        var r = map( obj.t, t_min, t_max, 0, width / 2 );
+        ctx.strokeStyle = "#09C";
+        G.arc( width / 2 - r / 2, Y, r / 2, -PI, 0 );
+
+        r = map( obj.ff, ff_min, ff_max, 0, width / 2 );
+        ctx.strokeStyle = "#F00";
+        G.arc( width / 2 + r / 2, Y, r / 2, -PI, 0 );
     });
 
-    //dessine des portions d'anneau en bleu
-    ctx.strokeStyle = ctx.fillStyle = "#09C";
-    data.forEach( function( obj, i ){
-        var a =  i / data.length * PI2;
-        var span = a + PI2 / data.length;
-        var r = map( obj.t, t_min, t_max, inRadius, outRadius );
-        G.fillRing( width/2, height/2, inRadius,r, a, span  );
-        G.strokeRing( width/2, height/2, inRadius,r, a, span  );
-    });
+    ctx.strokeStyle = "#999";
+    G.graduation( 1, Y, width-1, Y, 100, 5 );
+    G.graduation( 1, Y, width-1, Y, 50, 10 );
+    G.graduation( 1, Y, width-1, Y, 10, 15 );
 
-    //dessine des portions d'anneau en jaune
-    ctx.strokeStyle = ctx.fillStyle = "#FC0";
-    data.forEach( function( obj, i ) {
-        var a = i / data.length * PI2;
-        var span = a + PI2 / data.length;
-        var r = map(obj.ff, ff_min, ff_max, inRadius, outRadius);
-        G.fillRing(width / 2, height / 2, inRadius, r, a, span);
-        G.strokeRing(width / 2, height / 2, inRadius, r, a, span);
-    });
 }
