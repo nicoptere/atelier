@@ -13,7 +13,17 @@
             padding:0;
             overflow: hidden;
         }
-
+        .instructions
+        {
+            position: absolute;
+            top:0;
+            left:0;
+            margin : 10px;
+            padding : 10px;
+            z-index: 10;
+            background-color: white;
+        }
+        .instructions ul{ margin-left: -20px;}
     </style>
 </head>
 <body>
@@ -25,6 +35,7 @@
 <!--utilitaires géométriques-->
 <script src="utils/convexhull.js"></script>
 <script src="utils/catmullrom.js"></script>
+<script src="utils/paletteGenerator.js"></script>
 <script src="light-map/light-map.js"></script>
 
 
@@ -35,8 +46,8 @@
     var w = window.innerWidth;
     var h = window.innerHeight;
 
-    var colors = ["#B27686", "#E16C63", "#FD7A40", "#F3A137", "#F6CD3F" ];
-
+    var colors = paletteGenerator.generate(20, 10);
+//    http://elasticterrain.xyz/data/tiles/10/538/364.png
     var provider = 'http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg';
     var domains = '1234'.split('');
     var map = new Map( provider, domains, w,h, 1, 19 );
@@ -45,7 +56,6 @@
     var lat =  48.8534100;
     var lon =  2.348800;
     map.setView( lat, lon, 12 );
-
 
     document.body.appendChild( map.canvas );
     var G = new Graphics( map.ctx );
@@ -58,10 +68,10 @@
         requestAnimationFrame(draw);
 
         // redessine le fonds de carte
+        ctx.globalAlpha = 1;
         map.renderTiles();
 
         var border = [];
-        ctx.fillStyle = ctx.strokeStyle = colors[ map.zoom % colors.length ];
         for( var i = 0; i< coords.length; i+=2 )
         {
             var xy = map.latLonToPixels(coords[i+1], coords[i] );
@@ -69,16 +79,25 @@
             border.push( np );
         }
 
-        ctx.globalAlpha = .35;
 
-        ctx.fillStyle = "#000";
+//        colors.forEach(function( c, i )
+//        {
+//            ctx.fillStyle = c;
+//            ctx.fillRect( Math.round( i * w/colors.length ), 0, Math.round(w/colors.length ), h )
+//
+//        });
+//        return;
+
+
+//        ctx.globalAlpha = .35;
+        ctx.globalCompositeOperation = "hard-light";
+        ctx.fillStyle = ctx.strokeStyle = colors[ 0 ];
         G.polygon(border, true );
-        ctx.globalAlpha = 1;
 
 
         groups.forEach( function( pos, i )
         {
-            ctx.fillStyle = ctx.strokeStyle = colors[ i % colors.length ];
+            ctx.fillStyle = ctx.strokeStyle = colors[ (1+i) % colors.length ];
 
             pos.forEach( function( p )
             {
@@ -87,9 +106,7 @@
             });
 
             var hull = convexhull.compute( pos ).map( lonLatToPixels );
-            ctx.globalCompositeOperation = "hard-light";
             G.polygon( CatmullRom.compute( hull, .1, true ), true );
-            ctx.globalCompositeOperation = "source-over";
 
         })
     }
@@ -197,11 +214,14 @@
 
     window.addEventListener( "keydown", onKeyHandler, false );
     window.addEventListener( "keyup", onKeyHandler, false );
-
-
-
     draw();
 
 </script>
+<div class="instructions">
+    <ul>
+        <li>click / drag / molette pour explorer la carte</li>
+        <li>CTRL + click, click, click pour dessiner des formes</li>
+    </ul>
+</div>
 </body>
 </html>
