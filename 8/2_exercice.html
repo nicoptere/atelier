@@ -123,7 +123,7 @@
 
         });
 
-        if( map.zoom >= 14 ) {
+        if( map.zoom >= 15 ) {
 
             ctx.beginPath();
             ctx.strokeStyle = "#F00";
@@ -143,8 +143,8 @@
             ctx.stroke();
 
         }
-        
-        if( map.zoom >= 13 )
+
+        if( map.zoom >= 12 )
         {
 
             ctx.beginPath();
@@ -217,6 +217,11 @@
         if(e.type=="keydown" && e.which == 32 )
         {
             new CSVLoader().load( "stations.csv", onStationsReady, ";" );
+        }
+
+        if(e.type=="keydown" && e.which == 13 )
+        {
+            railwaysLoader.send();
         }
     }
 
@@ -297,9 +302,10 @@
 
         });
     };
+
     var lines = [];
-    var req = new XMLHttpRequest();
-    req.onload = function( e ){
+    var railwaysLoader = new XMLHttpRequest();
+    railwaysLoader.onload = function( e ){
 
         var result = e.target.responseText.split( '\n' );
         result.forEach( function( o ){
@@ -311,11 +317,8 @@
             });
             lines.push( cs );
         });
-//        console.log( result.length );
-        console.log( lines[0] )
     };
-    req.open( "GET", "railways.txt" );
-    req.send();
+    railwaysLoader.open( "GET", "railways.txt" );
 
     window.onload = draw;
 
@@ -324,7 +327,8 @@
     <ul>
         <li>click / drag / molette pour explorer la carte</li>
         <li>CTRL + click, click, click pour dessiner des formes</li>
-        <li>ESPACE pour charger/afficher les stations SNCF (Zoom 14+)</li>
+        <li>ESPACE pour charger/afficher les stations SNCF (Zoom 15+)</li>
+        <li>ENTREE pour charger/afficher les voies ferrées (Zoom 12+)</li>
     </ul>
 </div>
 <div class="zoom">12</div>
