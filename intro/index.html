@@ -7,7 +7,7 @@
     <title>intro</title>
 
     <link rel="stylesheet" href="css/reveal.css">
-    <link rel="stylesheet" href="css/theme/night.css" id="theme">
+    <link rel="stylesheet" href="css/theme/white.css" id="theme">
 </head>
 
 <body>
@@ -26,8 +26,7 @@
             <section>
 
                 <p>Beaux-Arts</p>
-                <p>Budapest</p>
-                <p>Flash</p>
+                <p>Flasheur</p>
                 <p>Freelance</p>
 
             </section>
@@ -44,13 +43,15 @@
                 <p>mes journées</p>
                 <p>bosser pour des agences de pub</p>
                 <p>faire des recherches personnelles</p>
-                <p>enseigner transmettre partager</p>
+                <p>transmettre et partager</p>
 
             </section>
 
             <section>
                 <p>boulot</p>
                 <p><a href="http://wearedata.watchdogs.com/">We Are Data</a> | <a href="http://my.deejo.fr/">Deejo</a></p>
+                <p style="color:#808080">projet d'un an qui ne sortira pas :/</p>
+
 
                 <p>perso</p>
                 <p><a href="http://barradeau.com/blog">blog</a> | <a href="http://barradeau.com/one-trick-ponies/">one trick ponies</a></p>
@@ -71,10 +72,9 @@
             <section>
                 <h3>infographie</h3>
                 <ul>
-                    <li>"fait main" et à but "esthétique"</li>
-                    <li>peu de données</li>
-                    <li>pré-traitement manuel</li>
-                    <li>difficile à reproduire</li>
+                    <li>didactique et/ou "esthétisant"</li>
+                    <li>peu de données, pré-traitées manuellement</li>
+                    <li>difficile à transposer</li>
                 </ul>
             </section>
             <section data-background="assets/e5cd980c5ca58922824524be583eaa57.jpg">http://www.cap-com.org/content/des-infographies-pour-communiquer-autour-des-%C3%A9lections</section>
@@ -94,16 +94,44 @@
 
             <section>
                 <h3>désambiguation²</h3>
-                <p> information VS exploration</p>
+                <p>information VS exploration</p>
             </section>
 
-            <section>dataviz informative<br>on sait ce qu'on veut mettre en valeur dans le jeu de données<br>la visualisation permet de "mettre en lumière" (d'illustrer)</section>
-            <section data-background="assets/vents.png">http://earth.nullschool.net/#current/wind/surface/level/orthographic=-220.81,-16.54,494</section>
+            <section><h3>informative</h3><br>on sait ce qu'on veut mettre en lumière<br>la visualisation permet d'illustrer les données</section>
+            <section data-background="assets/vents.png">http://earth.nullschool.net/#current/wind/surface/level/</section>
 
-            <section>dataviz exploratoire<br>on ne sait pas ce qu'on cherche dans les données<br>la visualisation nous aide à trouver des pistes</section>
+            <section><h3>exploratoire</h3><br>on ne sait pas ce qu'on cherche<br>la visualisation permet de trouver des pistes</section>
+            <section>
+                <p>exemple:</p>
+                <p>un graphe visualise 802 membres de la SDN<br>reliées par 6579 arêtes (10363 relations)</p>
+                <p><a href="http://www.martingrandjean.ch/archive-reseau-visualisation-donnes-sciences-humaines/">exemple trouvé ici</a></p>
+            </section>
+            <section><img src="assets/exploration.png"></section>
+
+            <section><p>en vert: les Contacts de Paul Otlet</p></section>
+            <section><img src="assets/exploration_0.png"></section>
+            <section><p>en orange: les contacts de La Fontaine</p></section>
+            <section><img src="assets/exploration_1.png"></section>
+            <section><p>en jaune: leurs contacts communs</p></section>
+            <section><img src="assets/exploration_2.png"></section>
+
+
+
+            <section><h3>+hybride</h3><br>la visualisation permet d'illustrer certaines données<br>et de créer de nouvelles relations</section>
+
             <section data-background="assets/data_100k.png">
                 <iframe src="https://player.vimeo.com/video/143200122" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
                 <p><a href="https://vimeo.com/143200122">Timespace</a> from <a href="https://vimeo.com/variableio">variable</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+            </section>
+
+
+            <section>
+                <h3>questions à se poser</h3>
+                <ul>
+                    <li>de quelles informations ai-je besoin?</li>
+                    <li>combien de dimensions?</li>
+                    <li>série? hiérarchie? variance? granularité?</li>
+                </ul>
             </section>
 
             <section>
@@ -112,31 +140,48 @@
 
                 <p>
                     exemple: <strong><em>temps</em></strong> et <strong><em>température</em></strong><br>
-                    peuvent varier indépendamment
+                    peuvent varier indépendamment<br>
+                    ce sont 2 dimensions distinctes
                 </p>
-                <p>une "dimension" n'est pas affectée<br>par la variation des autres dimensions</p>
 
                 <p>au delà de 4 dimensions il devient<br>difficile de lire une dataviz</p>
 
             </section>
 
+
             <section>
-                <h4>questions à se poser</h4>
-                <ul>
-                    <li>de quelles informations ai-je besoin?</li>
-                    <li>combien de dimensions? lesquelles?</li>
-                    <li>quelles relations entretiennent-elles:</li>
-                    <li>est ce une série? une hiérarchie?</li>
-                    <li>variance? fréquence? niveau de détail?</li>
-                </ul>
+                <h3>typologies</h3>
+                <p>certaines formes de visualisation sont des "standards"<br>
+                    elles transmettent efficacement un type de relation<br>ne réinventez pas (trop) la roue</p>
+            </section>
+
+            <section data-background="../appendix/data-chart-type.png">http://img.labnol.org/di/data-chart-type.png</section>
+
+            <section>
+                <h3>choisir le bon outil</h3>
+                <p>chapitre de "Designing Data Visualisation":<br>
+                    <a href="https://www.safaribooksonline.com/library/view/designing-data-visualizations/9781449314774/ch04.html">Choosing Appropriate Visual Encodings</a>
+                </p>
             </section>
 
             <section>
-                <h4>choisir l'outil adapté</h4>
-                <img src="../appendix/data-chart-type.png">
+                <h3>les cercles</h3>
+                <p>notre cerveau est nul pour quantifier les espaces courbes<br>
+                en général, le cercle sont une fausse bonne idée<br>
+                    ça reste très joli
+                </p>
             </section>
+
+
             <section>
-                <p>liens</p>
+                <h3>la fascination</h3>
+                <p>on peut facilement passer des heures à patouiller les paramètres<br>
+                    méfiez vous du chant des sirènes, tenez vous en au plan.
+                </p>
+            </section>
+
+            <section>
+                <p>plein les mirettes</p>
                 <a href="http://flowingdata.com/">flowing data</a><br>
                 <a href="http://www.visualcomplexity.com/vc/">visual complexity</a><br>
                 <a href="http://infosthetics.com/">infosthetics</a><br>
@@ -156,7 +201,7 @@
 <script>
 
     Reveal.initialize();
-Reveal.slide( 1, 14 )
+Reveal.slide( 1, 27 )
 </script>
 
 </body>

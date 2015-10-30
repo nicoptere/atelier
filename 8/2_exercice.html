@@ -13,7 +13,7 @@
             padding:0;
             overflow: hidden;
         }
-        .instructions
+        .instructions, .zoom
         {
             position: absolute;
             top:0;
@@ -24,6 +24,10 @@
             background-color: white;
         }
         .instructions ul{ margin-left: -20px;}
+        .zoom{
+            left:auto;
+            right:0;
+        }
     </style>
 </head>
 <body>
@@ -36,6 +40,8 @@
 <script src="utils/convexhull.js"></script>
 <script src="utils/catmullrom.js"></script>
 <script src="utils/paletteGenerator.js"></script>
+<script src="CSVLoader.js"></script>
+<script src="TXTLoader.js"></script>
 <script src="light-map/light-map.js"></script>
 
 
@@ -46,18 +52,31 @@
     var w = window.innerWidth;
     var h = window.innerHeight;
 
-    var colors = paletteGenerator.generate(20, 10);
-//    http://elasticterrain.xyz/data/tiles/10/538/364.png
-    var provider = 'http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg';
-    var domains = '1234'.split('');
-    var map = new Map( provider, domains, w,h, 1, 19 );
+    /**
+     * liste de fonds de cartes
+     * http://leaflet-extras.github.io/leaflet-providers/preview/index.html
+     *
+     * OSM: activité des trains
+     * http://www.openrailwaymap.org/?lang=en&lat=48.8534100&lon=2.348800&zoom=11&style=standard
+     */
 
+//    var provider = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+//    var domains = 'abc'.split('');
+
+//    var provider = 'http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg';
+//    var doamins = '1234'.split('');
+
+    var provider = 'http://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png';
+    var doamins = 'abcd'.split('');
+
+    var map = new Map( provider, doamins, w,h, 1, 21 );
 
     var lat =  48.8534100;
     var lon =  2.348800;
     map.setView( lat, lon, 12 );
 
     document.body.appendChild( map.canvas );
+    var colors = paletteGenerator.generate(100, 20);
     var G = new Graphics( map.ctx );
     var ctx = map.ctx;
 
@@ -66,11 +85,13 @@
     function draw()
     {
         requestAnimationFrame(draw);
+        document.getElementsByClassName("zoom")[0].innerText = "zoom: "+ map.zoom;
 
         // redessine le fonds de carte
         ctx.globalAlpha = 1;
         map.renderTiles();
 
+        //redessine le contour de Paris intramuros
         var border = [];
         for( var i = 0; i< coords.length; i+=2 )
         {
@@ -78,23 +99,15 @@
             var np = new Point( xy[0], xy[1] );
             border.push( np );
         }
-
-
-//        colors.forEach(function( c, i )
-//        {
-//            ctx.fillStyle = c;
-//            ctx.fillRect( Math.round( i * w/colors.length ), 0, Math.round(w/colors.length ), h )
-//
-//        });
-//        return;
-
-
-//        ctx.globalAlpha = .35;
         ctx.globalCompositeOperation = "hard-light";
-        ctx.fillStyle = ctx.strokeStyle = colors[ 0 ];
-        G.polygon(border, true );
+        ctx.fillStyle = ctx.strokeStyle = "hsl( 85, 50%, 50%)";
+        ctx.lineWidth = map.zoom;
+        ctx.lineJoin = "round";
 
+        G.polyline( border, true );
+        ctx.lineWidth = 1;
 
+        //dessine les groupes de points
         groups.forEach( function( pos, i )
         {
             ctx.fillStyle = ctx.strokeStyle = colors[ (1+i) % colors.length ];
@@ -108,11 +121,59 @@
             var hull = convexhull.compute( pos ).map( lonLatToPixels );
             G.polygon( CatmullRom.compute( hull, .1, true ), true );
 
-        })
+        });
+
+        if( map.zoom >= 14 ) {
+
+            ctx.beginPath();
+            ctx.strokeStyle = "#F00";
+            stations.forEach(function (station) {
+
+                for (var i = 0; i < station.length - 1; i++) {
+                    var p0 = map.latLonToPixels(station[i][1], station[i][0]);
+                    if (p0[0] < 0 || p0[0] > w || p0[1] < 0 || p0[1] > h)continue;
+
+                    var p1 = map.latLonToPixels(station[i + 1][1], station[i + 1][0]);
+                    if (p1[0] < 0 || p1[0] > w || p1[1] < 0 || p1[1] > h)continue;
+
+                    ctx.moveTo(p0[0], p0[1]);
+                    ctx.lineTo(p1[0], p1[1]);
+                }
+            });
+            ctx.stroke();
+
+        }
+        
+        if( map.zoom >= 13 )
+        {
+
+            ctx.beginPath();
+            ctx.strokeStyle = "#09C";
+            ctx.globalCompositeOperation = "source-over";
+            lines.forEach(function(line){
+
+                for( var i = 0; i < line.length-1;i++ )
+                {
+                    var p0 = map.latLonToPixels( line[ i][1],      line[ i ][0] );
+                    if( p0[0]<0 || p0[0]>w ||p0[1]<0 || p0[1]>h )continue;
+
+                    var p1 = map.latLonToPixels( line[ i + 1][1],  line[ i + 1][0] );
+                    if( p1[0]<0 || p1[0]>w ||p1[1]<0 || p1[1]>h )continue;
+
+                    ctx.moveTo( p0[0], p0[1]);
+                    ctx.lineTo( p1[0], p1[1]);
+                }
+            });
+            ctx.stroke();
+
+        }
     }
 
     function lonLatToPixels(p){
         var xy = map.latLonToPixels( p.x, p.y );
+
+        //transformations spécifiques si besoin
+
         return new Point( xy[0], xy[1] );
     }
 
@@ -152,6 +213,11 @@
         {
             if( pos.length != 0 )pos = [];
         }
+
+        if(e.type=="keydown" && e.which == 32 )
+        {
+            new CSVLoader().load( "stations.csv", onStationsReady, ";" );
+        }
     }
 
     function onMove(e){
@@ -171,6 +237,7 @@
 
             origin.x = e.clientX;
             origin.y = e.clientY;
+
         }
     }
 
@@ -214,14 +281,52 @@
 
     window.addEventListener( "keydown", onKeyHandler, false );
     window.addEventListener( "keyup", onKeyHandler, false );
-    draw();
+
+
+    //charge le CSV des gares et lignes de train
+
+    var stations = [];
+    function onStationsReady(result){
+
+        result.forEach( function( o ){
+
+            o.geoshape = JSON.parse( o.geoshape.replace( /^"/gi, "" ).replace( /"$/gi, "" ).replace( /""/gi, '"' ) );
+
+            if(o.geoshape.type == "LineString" )stations.push( o.geoshape.coordinates );
+            if( o.ligne ) o.ligne = o.ligne.split( ',' );
+
+        });
+    };
+    var lines = [];
+    var req = new XMLHttpRequest();
+    req.onload = function( e ){
+
+        var result = e.target.responseText.split( '\n' );
+        result.forEach( function( o ){
+            var cs = [];
+            o.split(",").forEach( function(bit){
+
+                var coords = bit.replace(/^\s\s*/, '').replace(/\s\s*$/, '').split( " " );
+                cs.push( [parseFloat( coords[0] ),parseFloat( coords[1] )] );
+            });
+            lines.push( cs );
+        });
+//        console.log( result.length );
+        console.log( lines[0] )
+    };
+    req.open( "GET", "railways.txt" );
+    req.send();
+
+    window.onload = draw;
 
 </script>
 <div class="instructions">
     <ul>
         <li>click / drag / molette pour explorer la carte</li>
         <li>CTRL + click, click, click pour dessiner des formes</li>
+        <li>ESPACE pour charger/afficher les stations SNCF (Zoom 14+)</li>
     </ul>
 </div>
+<div class="zoom">12</div>
 </body>
 </html>
