@@ -21,7 +21,10 @@
 
 </head>
 <body>
+
+    <!--ajout d'un import contenant les essentiels-->
     <script src="../base.js"></script>
+
     <script>
 
         //une classe point qui stocke 2 coorodnnées X et Y
@@ -34,18 +37,27 @@
         //une méthode de dessin pour dessiner en boucle
         function draw()
         {
+            //requestAnimationFrame est un polyfill qui
+            //rappelle la fonction draw() aussi souvent que possible
+
             requestAnimationFrame( draw );
 
+            //on efface tout
             ctx.clearRect( 0,0,w,h );
 
-            var p, size = 25;
+            //on crée un Point à :
+            // 100 px en X
+            // 150 px en Y
+            var p = new Point( 100, 150 );
 
-            p = new Point( 100, 100 );
+            //taille du point
+            var size = 25;
 
+            //on dessine un rectangle de taille SIZE à la position P
             ctx.fillRect( p.x, p.y, size,size );
 
             
-            //dessine un carré centré
+            //dessine un carré centré: on change la position de P
             /*
             p = new Point( w/2, h/2 );
             ctx.fillRect( p.x, p.y, size,size );
