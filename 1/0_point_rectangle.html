@@ -57,9 +57,12 @@
             ctx.fillRect( p.x, p.y, size,size );
 
             
-            //dessine un carré centré: on change la position de P
+            //dessine un carré centré:
             /*
+            //on change la position de P
             p = new Point( w/2, h/2 );
+
+            //onre dessine à la nouvelle position, à la même taille
             ctx.fillRect( p.x, p.y, size,size );
             //*/
 
@@ -73,21 +76,35 @@
 
             /*
             //dessine 100 carrés un peu partout
-            points.forEach( function( p,i ){
 
+            //si le tableau de point n'existe pas
+            if( points == null ){
+                //on le crée
+                points = [];
+
+                //et on le remplit
+                for( var i = 0; i < 100; i++ ){
+
+                    //de points placés aléatoirement sur la surface de l'écran
+                    var p = new Point(  Math.random() * w,
+                                        Math.random() * h );
+                    points.push( p );
+                }
+            }
+
+
+             points.forEach( function( p,i ){
+
+                //au lieu d'utiliser la taille size
+                //on peut utiliser une autre variable
+                // l'index du point dans le tableau par exemple
                 ctx.fillRect( p.x, p.y, i/2, i/2 );
 
             });
             //*/
 
         }
-        
-        var points = [];
-        for( var i = 0; i < 100; i++ ){
-            var p = new Point( Math.random() * w, Math.random() * h );
-            points.push( p );
-        }
-        
+        var points = null;
         draw();
 
 
