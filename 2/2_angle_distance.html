@@ -27,7 +27,7 @@
 <script>
 
     var mouseDown = false;
-    var center = new Point(); // centre
+    var center = new Point();// centre
     var mouse = new Point();// souris
     var other = new Point();// point arbitraire
 
@@ -78,6 +78,7 @@
 
         //dessine le cercle positionné au centre de rayon:  centre - souris
         G.circle( center, distance );
+
         //trace une ligne entre le centre et la position de la souris
         G.line( center, mouse );
 
@@ -89,6 +90,7 @@
         //dessine le cercle positionné sur la souris de rayon:  centre - souris
         //G.circle( mouse, distance );
 
+        return;
 
         //dessine une portion de cercle entre 0 et l'angle: centre ^ souris
 
@@ -99,18 +101,16 @@
         ctx.lineWidth = 5;
         G.sector( center, 100, 0, angle );
 
-        //*/
-
+        return;
         
-        //distance à un point arbitraire    
-        /*
+        //distance à un point arbitraire
+
         ctx.lineWidth = 1;
         ctx.fillStyle = "rgba( 255,192,0, .5 )";
         ctx.strokeStyle = "rgb( 255,192,0 )";
         G.disc( other, 5 );
         G.circle( other, getDistance( other, mouse ) );
         G.sectorFilled( other, getDistance( other, mouse ), 0, getAngle( other, mouse ) );
-        //*/
 
     }
 
@@ -128,6 +128,7 @@
         {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
+            console.log( "distance centre souris =", getDistance( mouse, center).toFixed(2), "pixels" );
         }
     }
     window.addEventListener( 'mouseup', onUp, false );

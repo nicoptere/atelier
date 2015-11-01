@@ -76,7 +76,6 @@
         ctx.fillStyle = "#06C";//bleu
         G.disc( interpolation, A.y, 5 );
 
-
         return;
 
         //on peut représneter graphiquement ces valeurs comme suit:
@@ -85,7 +84,7 @@
         for( T = 0; T <= 1; T += .1 )
         {
 
-            // oncalcule la valeur interpolée
+            // on calcule la valeur interpolée
             interpolation = A.x + T * ( B.x - A.x );
 
             //et on peut la dessiner
@@ -111,6 +110,8 @@
         G.circle( B.x, B.y, 10 );
         G.line( A,B );
         G.text( "B", 24, B.x - 12, B.y - 16);//place la lettre "B" au dessus du point B
+
+        return;
 
         ctx.strokeStyle = ctx.fillStyle = "#fC0";
         for( T = 0; T <= 1; T += .1 )

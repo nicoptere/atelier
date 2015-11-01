@@ -40,7 +40,7 @@
         ctx.clearRect( 0,0,w,h );
 
         //partant de 3 valeurs arbitraires T, A et B
-        //normaliser T entre A et B permet de retrouver un indice compris entre 0 et 1
+        //normaliser T entre A et B permet de retrouver un chiffre compris entre 0 et 1
 
         var t = 10;
         var a = -5;
@@ -158,7 +158,7 @@
         //prend le plus petit chiffre possible -(2^53) comme maximum
         var maximum = -Math.pow(2, 53);
 
-        for( i = 0; i < values.length; i++ ){
+        for( i = 0; i < count; i++ ){
 
             //pour chaque valeur X
             x = values[ i ];

@@ -32,7 +32,6 @@
 
         //tableau de points dont on va se resservir
         var shape = [
-
                 new Point( 0,0 ),
                 new Point( 0,0 ),
                 new Point( 0,0 )
@@ -92,15 +91,16 @@
             ctx.fill();
 
 
-
             //ici on va dessiner un tableau que l'on remplit au click
             ctx.beginPath();
             handdrawn.forEach( function( p )
             {
                 ctx.lineTo(p.x, p.y);
             });
+            //dessine au trait
             ctx.stroke();
 
+            //remplit la forme
             ctx.fill();
 
 

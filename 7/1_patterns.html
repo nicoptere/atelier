@@ -94,10 +94,14 @@
         ctx.fillStyle = ctx.createPattern( patCanvas, 'repeat-x' );
         ctx.fillRect(0, 0, w, h );
 
+        return;
+
         //une frise verticale
         ctx.clearRect(0,0,w,h);
         ctx.fillStyle = ctx.createPattern( patCanvas, 'repeat-y' );
         ctx.fillRect(0, 0, w, h );
+
+        return;
 
         //ou pas de frise du tout
         ctx.clearRect(0,0,w,h);
