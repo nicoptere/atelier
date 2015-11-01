@@ -70,10 +70,17 @@
 
 
         //dessine un rectangle au trait entre:
+        //pour dessiner au trait, on utilise l'instruction :
+
+        //ctx.strokeRect(  origine X, origine Y, largeur, hauteur );
+
+        //au lieu de remplir tout l'espace, on dessine un rectangle centré au trait
+        //les coordonnées:
+
         // 64px à gauche
         // 64px en haut
-        // 512 - ( 2 * 64 )px de large
-        // 512 - ( 2 * 64 )px de haut
+        // 512 - ( 2 * 64 )px de large -> 384 px
+        // 512 - ( 2 * 64 )px de haut -> 384 px
 
         ctx.strokeRect( 64, 64, width - 128, height - 128 );
 
@@ -83,14 +90,23 @@
         ctx.stroke();
         //*/
 
+            //au passage
+            //si on veut éditer facilement la largeur des marges, on peut écrire
+            /*
+            var margin = 32;
+            ctx.strokeRect( margin, margin, width - 2 * margin, height - 2 * margin );
+            //*/
+
         //dessine un rectangle plein
+
         /*
         ctx.fillRect( 0,0,width, height );
         //*/
 
-        //efface une zone rectangulaire
+        //pour effacer une zone rectangulaire, on utilise l'instruction
+        //  ctx.clearRect( X, Y, W, H );
+
         /*
-        ctx.clearRect( X, Y, W, H );
         ctx.clearRect( 64,64,384,384 );
         //*/
 
