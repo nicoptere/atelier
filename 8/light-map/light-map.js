@@ -472,7 +472,13 @@ module.exports = function(){
 
     }
 
-
+    /**
+     * converts local X & Y coordinates and zoom level to latitude and longitude
+     * @param x X position on the canvas
+     * @param y Y position on the canvas
+     * @param zoom zoom level (optional, falls back to the map's current zoom level)
+     * @returns {*} array[ lat, lon ] in degrees
+     */
     function pixelsToLatLon( x,y, zoom )
     {
 
@@ -483,6 +489,14 @@ module.exports = function(){
 
     }
 
+
+    /**
+     * converts latitude/longitude at a given zoom level to a local XY position
+     * @param lat latitude in degrees
+     * @param lon longitude in degress
+     * @param zoom zoom level (optional, falls back to the map's current zoom level)
+     * @returns {*} array[ X, Y ] in pixels
+     */
     function latLonToPixels( lat,lon, zoom )
     {
 
